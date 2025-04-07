@@ -3,6 +3,7 @@ package com.aquatrack.service;
 import com.aquatrack.dto.UserLoginRequest;
 import com.aquatrack.dto.UserRegisterRequest;
 import com.aquatrack.entity.User;
+import com.aquatrack.jwt.JwtTokenProvider;
 import com.aquatrack.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,6 +47,7 @@ public class UserService {
         }
 
         // 로그인 성공 → JWT 발급
+        JwtTokenProvider jwtTokenProvider = new JwtTokenProvider();
         return jwtTokenProvider.createToken(user.getEmail());
     }
 

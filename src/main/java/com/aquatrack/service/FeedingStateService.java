@@ -1,5 +1,7 @@
 package com.aquatrack.service;
 
+import com.aquatrack.entity.AutoFeedingState;
+import com.aquatrack.repository.AutoFeedingStateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
