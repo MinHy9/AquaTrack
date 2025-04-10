@@ -12,6 +12,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 
 @Entity
@@ -24,6 +25,8 @@ public class Notification {
 	@Column(nullable = false,columnDefinition = "TEXT")
 	private String message;
 	
+	private String title;
+	
 	@CreationTimestamp
 	private LocalDateTime sentAt;
 	
@@ -31,15 +34,32 @@ public class Notification {
 	@JsonIgnore
 	private Alert alert;
 	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JsonIgnore
+	private User user;
+	
 	@Override
 	public String toString() {
 		return "Notification [notificationId=" + notificationId + ", message=" + message + ", sentAt=" + sentAt + "]";
 	}
 
-	public Notification(String message, LocalDateTime sentAt) {
+	public Notification(String message, LocalDateTime sentAt,String title) {
 		super();
 		this.message = message;
 		this.sentAt = sentAt;
+		this.title = title;
+	}
+	
+	public Notification() {
+		
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public int getNotificationId() {
@@ -72,6 +92,14 @@ public class Notification {
 
 	public void setAlert(Alert alert) {
 		this.alert = alert;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 }

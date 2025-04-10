@@ -53,6 +53,14 @@ public class WaterQualityLog {
 				+ turbidity + ", recordedAt=" + recordedAt + "]";
 	}
 
+	public Alert getAlert() {
+		return alert;
+	}
+
+	public void setAlert(Alert alert) {
+		this.alert = alert;
+	}
+
 	public WaterQualityLog() {};
 	public WaterQualityLog(int logId, float temperature, float ph, float turbidity, LocalDateTime recordedAt) {
 		super();
