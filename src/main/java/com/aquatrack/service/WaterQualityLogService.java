@@ -21,6 +21,7 @@ public class WaterQualityLogService {
     private final WaterQualityLogRepository logRepository;
     private final FeedingStateService feedingStateService;
     private final AlertRepository alertRepository;
+    private final NotificationService notificationService;
 
     public WaterQualityLog save(@Valid WaterQualityLogRequest request) {
         Aquarium aquarium = aquariumRepository.findById(request.getAquariumId())
@@ -75,6 +76,9 @@ public class WaterQualityLogService {
                 .message(message)
                 .resolved(false)
                 .build();
-        alertRepository.save(alert);
+        Alert saved = alertRepository.save(alert);
+
+        // Alert 생성과 동시에 Notification 전송
+        notificationService.sendNotification(saved);
     }
 }

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Alert {
+public class Alert { // 센서에서 서버로 알림
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long alertId;

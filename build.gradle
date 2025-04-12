@@ -28,6 +28,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation platform('software.amazon.awssdk:bom:2.20.78')
+    implementation 'software.amazon.awssdk:sns'
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5'
     compileOnly 'org.projectlombok:lombok'
