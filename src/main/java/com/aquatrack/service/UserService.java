@@ -32,6 +32,7 @@ public class UserService {
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(encodedPassword)
+                .phone(request.getPhone())
                 .build();
 
         userRepository.save(newUser);

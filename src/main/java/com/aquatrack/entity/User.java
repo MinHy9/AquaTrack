@@ -23,6 +23,9 @@ public class User {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
+    @Column(nullable = false, length = 20)
+    private String phone;  //sms 전송용 번호
+
     @Column(nullable = false, length = 255)
     private String password;
 
