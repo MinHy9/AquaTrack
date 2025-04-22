@@ -7,10 +7,9 @@ import java.time.LocalDate;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class DailySensorStatResponse {
-    private String periodLabel; // "2025-04-07", "2025-W15", "2025-04" 모두 가능
-    private Double avgTemperature;
-    private Double avgPH;
-    private Double avgTurbidity;
+    private Object dateLabel; // 일간: LocalDate, 주간/월간: String (DATE_FORMAT 결과)
+    private Double temperatureAvg;
+    private Double pHAvg;
+    private Double turbidityAvg;
 }
