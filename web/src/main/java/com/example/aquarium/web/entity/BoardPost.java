@@ -1,31 +1,45 @@
 package com.example.aquarium.web.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
 public class BoardPost {
-	
-	
+		
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int postId;
+	private Long postId;
 	
 	@Column(nullable = false)
 	private String title;
 	
 	@Column(columnDefinition = "TEXT",nullable = false)
+	@Lob
 	private String content;
 	
 	@CreationTimestamp
@@ -35,61 +49,7 @@ public class BoardPost {
 	@JsonIgnore
 	private User user;
 	
-	public int getPostId() {
-		return postId;
-	}
-
-	public void setPostId(int postId) {
-		this.postId = postId;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	@Override
-	public String toString() {
-		return "BoardPost [postId=" + postId + ", title=" + title + ", content=" + content + ", createdAt=" + createdAt
-				+ "]";
-	}
-	public BoardPost() {};
-
-	public BoardPost(String title, String content, LocalDateTime createdAt) {
-		super();
-		this.title = title;
-		this.content = content;
-		this.createdAt = createdAt;
-	}
-	
-	
-	
+	@OneToMany(mappedBy = "boardpost", cascade = CascadeType.REMOVE)
+	private List<Comment> comments;
 
 }

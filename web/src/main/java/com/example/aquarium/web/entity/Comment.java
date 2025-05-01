@@ -1,6 +1,7 @@
 package com.example.aquarium.web.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -13,48 +14,43 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 @Entity
+@ToString
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
-@ToString
-public class Aquarium {
-
+@AllArgsConstructor
+public class Comment {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long aquariumId;
+	private Long commentId;
+	
+	@Lob
+	private String content;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private BoardPost boardpost;
 	
 	@CreationTimestamp
-	private LocalDateTime registeredDate;
+	private LocalDateTime createdAt;
 	
-	@Builder
-	public Aquarium(LocalDateTime registeredDate, User user) {
-		super();
-		this.user = user;
-		this.registeredDate = registeredDate;
-	}
-
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JsonIgnore
-	private User user;
-	
-	@OneToMany(mappedBy="aquarium",cascade = CascadeType.REMOVE)
-	@JsonIgnore
-	private List<WaterQualityLog> waterQualityLogList;
+    @JoinColumn(name = "parent_id")
+    @JsonIgnore
+    private Comment parentComment;
 
-	@OneToOne(mappedBy="aquarium",cascade = CascadeType.REMOVE)
-	private AutoFeedingState autoFeedingState;
-	
-	@OneToMany(mappedBy="aquarium",cascade = CascadeType.REMOVE)
-	private List<FeedingSchedule> feedingSchedule;
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.REMOVE,orphanRemoval = true)
+    private List<Comment> childComments = new ArrayList<>();
+
 }

@@ -1,139 +1,57 @@
 package com.example.aquarium.web.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@Builder
 public class Alert {
-	
-	public enum AlertType{
-		TEMPARATURE_WARNING,PH_WARNING,TURBIDITY_WARNING
-	}
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int alertId;
-	
-	@Column(columnDefinition = "TEXT",nullable = false)
-	private String message;
-	
-	private boolean resolved = false;
-	
-	@CreationTimestamp
-	private LocalDateTime createdAt;
-	
-	@Enumerated(EnumType.STRING)
-	@Column(nullable=false)
-	private AlertType alertType;
-	
-	
-	@OneToOne(fetch = FetchType.LAZY)
-	@JsonIgnore
-	private WaterQualityLog waterQualityLog;
-	
-	@OneToOne(mappedBy = "alert", cascade = CascadeType.ALL)
-	@JsonIgnore
-	private Notification notification;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JsonIgnore
-	private User user;
-	
 
-	public User getUser() {
-		return user;
-	}
+    public enum AlertType {
+        TEMPARATURE_WARNING, PH_WARNING, TURBIDITY_WARNING
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long alertId;
 
-	public Alert(String message, boolean resolved, LocalDateTime createdAt, AlertType alertType) {
-		super();
-		this.message = message;
-		this.resolved = resolved;
-		this.createdAt = createdAt;
-		this.alertType = alertType;
-	}
-	public Alert() {
-		
-	}
+    @Column(columnDefinition = "TEXT", nullable = false)
+    private String message;
 
-	@Override
-	public String toString() {
-		return "Alert [alertId=" + alertId + ", message=" + message + ", resolved=" + resolved + ", createdAt="
-				+ createdAt + ", alertType=" + alertType + "]";
-	}
+    private boolean resolved = false;
+    
 
-	public int getAlertId() {
-		return alertId;
-	}
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
-	public void setAlertId(int alertId) {
-		this.alertId = alertId;
-	}
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "alert_type")
+    private List<AlertType> alertTypes = new ArrayList<>();
 
-	public String getMessage() {
-		return message;
-	}
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
+    @OneToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private WaterQualityLog waterQualityLog;
 
-	public boolean isResolved() {
-		return resolved;
-	}
+    @OneToOne(mappedBy = "alert", cascade = CascadeType.REMOVE)
+    @JsonIgnore
+    private Notification notification;
 
-	public void setResolved(boolean resolved) {
-		this.resolved = resolved;
-	}
-
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	public AlertType getAlertType() {
-		return alertType;
-	}
-
-	public void setAlertType(AlertType alertType) {
-		this.alertType = alertType;
-	}
-
-	public WaterQualityLog getWaterQualityLog() {
-		return waterQualityLog;
-	}
-
-	public void setWaterQualityLog(WaterQualityLog waterQualityLog) {
-		this.waterQualityLog = waterQualityLog;
-	}
-
-	public Notification getNotification() {
-		return notification;
-	}
-
-	public void setNotification(Notification notification) {
-		this.notification = notification;
-	}
-	
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private User user;
 }
