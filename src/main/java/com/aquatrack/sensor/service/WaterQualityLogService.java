@@ -54,19 +54,27 @@ public class WaterQualityLogService {
         return logRepository.findTop10ByAquariumOrderByRecordedAtDesc(aquarium);
     }
 
+    //사용자기준값에 따라 자동급식 판단
     private boolean isWaterConditionNormal(WaterQualityLog log) {
-        return log.getTemperature() >= 23.0 && log.getTemperature() <= 28.0 &&
-                log.getPH() >= 6.5 && log.getPH() <= 8.0 &&
-                log.getTurbidity() <= 300.0;
+        Aquarium a = log.getAquarium();
+
+        return log.getTemperature() >= a.getCustomMinTemperature() &&
+                log.getTemperature() <= a.getCustomMaxTemperature() &&
+                log.getPH() >= a.getCustomMinPH() &&
+                log.getPH() <= a.getCustomMaxPH() &&
+                log.getTurbidity() <= a.getCustomMaxTurbidity();
     }
+
     private void checkAndCreateAlerts(WaterQualityLog log) {
-        if (log.getTemperature() < 23.0 || log.getTemperature() > 28.0) {
+        Aquarium a = log.getAquarium();
+
+        if (log.getTemperature() < a.getCustomMinTemperature() || log.getTemperature() > a.getCustomMaxTemperature()) {
             createAlert(log, AlertType.TEMPERATURE, "수온이 정상 범위를 벗어났습니다.");
         }
-        if (log.getPH() < 6.5 || log.getPH() > 8.0) {
+        if (log.getPH() < a.getCustomMinPH() || log.getPH() > a.getCustomMaxPH()) {
             createAlert(log, AlertType.PH, "pH 수치가 정상 범위를 벗어났습니다.");
         }
-        if (log.getTurbidity() > 300.0) {
+        if (log.getTurbidity() > a.getCustomMaxTurbidity()) {
             createAlert(log, AlertType.TURBIDITY, "탁도가 너무 높습니다.");
         }
     }
