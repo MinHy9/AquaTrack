@@ -25,7 +25,7 @@ public class SmsService {
 	 public void sendSms(String phoneNumber, String messageText) {
 	        try {
 	            Message message = new Message();
-	            message.setFrom("01033016490"); //인증된 발신번호로 바꾸기
+	            //message.setFrom(); //인증된 발신번호로 바꾸기
 	            message.setTo(phoneNumber);
 	            message.setText(messageText);
 
