@@ -15,14 +15,14 @@ public class ScheduledNotificationSender {
 	
 	private final NotificationService notificationService;
 	 
-	@Scheduled(fixedRate = 60000)
+	@Scheduled(fixedRate = 60000)//경고용 메시지 전송 주기 수정 가능
     public void sendScheduledNotifications() {
         notificationService.sendMsgsToAllUsersForCaution();
     }
 	
-//	@Scheduled(fixedRate = 60000)
-//	public void sendScheduledReNotifications() {
-//		notificationService.resendMsgsToSpecificUsers();
-//	}
+	@Scheduled(fixedRate = 60000)// 메시지 재전송 주기 수정 가능
+	public void sendScheduledReNotifications() {
+		notificationService.resendMsgsToSpecificUsers();
+	}
 	
 }
