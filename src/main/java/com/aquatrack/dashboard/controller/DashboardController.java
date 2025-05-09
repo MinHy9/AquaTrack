@@ -1,5 +1,7 @@
 package com.aquatrack.dashboard.controller;
 
+import com.aquatrack.aquarium.entity.Aquarium;
+import com.aquatrack.dashboard.dto.AquariumStatusResponse;
 import com.aquatrack.dashboard.dto.LatestSensorDataResponse;
 import com.aquatrack.sensor.entity.WaterQualityLog;
 import com.aquatrack.sensor.repository.WaterQualityLogRepository;
@@ -30,4 +32,35 @@ public class DashboardController {
                 .recordedAt(latestLog.getRecordedAt())
                 .build());
     }
+
+    @GetMapping("/aquarium/status")
+    public ResponseEntity<AquariumStatusResponse> getAquariumStatus(Principal principal) {
+        String email = principal.getName();
+
+        WaterQualityLog log = logRepository.findTopByAquarium_User_EmailOrderByRecordedAtDesc(email)
+                .orElseThrow(() -> new RuntimeException("센서 데이터가 없습니다."));
+
+        Aquarium aquarium = log.getAquarium();
+
+        return ResponseEntity.ok(AquariumStatusResponse.builder()
+                .fishName(aquarium.getFishName())
+                .temperature(log.getTemperature())
+                .temperatureStatus(getStatus(log.getTemperature(),
+                        aquarium.getCustomMinTemperature(),
+                        aquarium.getCustomMaxTemperature()))
+                .pH(log.getPH())
+                .pHStatus(getStatus(log.getPH(),
+                        aquarium.getCustomMinPH(),
+                        aquarium.getCustomMaxPH()))
+                .turbidity(log.getTurbidity())
+                .turbidityStatus(log.getTurbidity() > aquarium.getCustomMaxTurbidity() ? "경고" : "정상")
+                .recordedAt(log.getRecordedAt())
+                .build());
+    }
+
+    private String getStatus(Float value, Float min, Float max) {
+        if (value == null || min == null || max == null) return "데이터 없음";
+        return (value < min || value > max) ? "경고" : "정상";
+    }
+
 }
