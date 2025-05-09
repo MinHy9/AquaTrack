@@ -1,6 +1,9 @@
 package com.aquatrack.dashboard.controller;
 
+import com.aquatrack.alert.entity.Alert;
+import com.aquatrack.alert.repository.AlertRepository;
 import com.aquatrack.aquarium.entity.Aquarium;
+import com.aquatrack.dashboard.dto.AlertHistoryResponse;
 import com.aquatrack.dashboard.dto.AquariumStatusResponse;
 import com.aquatrack.dashboard.dto.LatestSensorDataResponse;
 import com.aquatrack.sensor.entity.WaterQualityLog;
@@ -10,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -17,6 +21,7 @@ import java.security.Principal;
 public class DashboardController {
 
     private final WaterQualityLogRepository logRepository;
+    private final AlertRepository alertRepository;
 
     @GetMapping("/data")
     public ResponseEntity<LatestSensorDataResponse> getLatestSensorData(Principal principal) {
@@ -62,5 +67,23 @@ public class DashboardController {
         if (value == null || min == null || max == null) return "데이터 없음";
         return (value < min || value > max) ? "경고" : "정상";
     }
+
+    @GetMapping("/alerts")
+    public ResponseEntity<List<AlertHistoryResponse>> getAlertHistory(Principal principal) {
+        String email = principal.getName();
+
+        List<Alert> alerts = alertRepository.findAllByUserEmail(email);
+
+        List<AlertHistoryResponse> responses = alerts.stream()
+                .map(a -> AlertHistoryResponse.builder()
+                        .alertType(a.getAlertType().name())
+                        .message(a.getMessage())
+                        .createdAt(a.getCreatedAt())
+                        .build())
+                .toList();
+
+        return ResponseEntity.ok(responses);
+    }
+
 
 }
