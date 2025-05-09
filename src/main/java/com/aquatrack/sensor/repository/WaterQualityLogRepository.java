@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface WaterQualityLogRepository extends JpaRepository<WaterQualityLog, Long> {
@@ -44,4 +45,9 @@ public interface WaterQualityLogRepository extends JpaRepository<WaterQualityLog
             "GROUP BY FUNCTION('DATE_FORMAT', w.recordedAt, '%Y-%m') " +
             "ORDER BY FUNCTION('DATE_FORMAT', w.recordedAt, '%Y-%m') DESC")
     List<DailySensorStatResponse> getMonthlyStats(@Param("email") String email);
+
+    //실시간 센서값
+    Optional<WaterQualityLog> findTopByAquarium_User_EmailOrderByRecordedAtDesc(String email);
+
+
 }
