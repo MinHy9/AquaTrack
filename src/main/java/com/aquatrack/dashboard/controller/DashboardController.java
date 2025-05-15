@@ -4,10 +4,7 @@ import com.aquatrack.alert.entity.Alert;
 import com.aquatrack.alert.repository.AlertRepository;
 import com.aquatrack.aquarium.entity.Aquarium;
 import com.aquatrack.aquarium.repository.AquariumRepository;
-import com.aquatrack.dashboard.dto.AlertHistoryResponse;
-import com.aquatrack.dashboard.dto.AquariumStatusResponse;
-import com.aquatrack.dashboard.dto.AquariumThresholdResponse;
-import com.aquatrack.dashboard.dto.LatestSensorDataResponse;
+import com.aquatrack.dashboard.dto.*;
 import com.aquatrack.sensor.entity.WaterQualityLog;
 import com.aquatrack.sensor.repository.WaterQualityLogRepository;
 import lombok.RequiredArgsConstructor;
@@ -105,5 +102,22 @@ public class DashboardController {
                 .build());
     }
 
+    @PutMapping("/aquarium/thresholds")
+    public ResponseEntity<String> updateThresholds(@RequestBody AquariumThresholdUpdateRequest req,
+                                                   Principal principal) {
+        String email = principal.getName();
 
+        Aquarium aquarium = aquariumRepository.findByUserEmail(email)
+                .orElseThrow(() -> new RuntimeException("어항을 찾을 수 없습니다."));
+
+        aquarium.setCustomMinTemperature(req.getMinTemperature());
+        aquarium.setCustomMaxTemperature(req.getMaxTemperature());
+        aquarium.setCustomMinPH(req.getMinPH());
+        aquarium.setCustomMaxPH(req.getMaxPH());
+        aquarium.setCustomMaxTurbidity(req.getMaxTurbidity());
+
+        aquariumRepository.save(aquarium);
+
+        return ResponseEntity.ok("기준값이 성공적으로 수정되었습니다.");
+    }
 }
