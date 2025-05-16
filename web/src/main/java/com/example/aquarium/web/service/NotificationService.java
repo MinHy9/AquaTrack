@@ -73,7 +73,7 @@ public class NotificationService {
         return minutes >= 5;
     }
 
-    
+    //모든 이에게 경고메시지 보냄, ScheduldedNotificationSender class에서 사용
     public void sendMsgsToAllUsersForCaution() {
     	List<User> users = userService.findAllUser();
         for (User user : users) {
@@ -86,7 +86,7 @@ public class NotificationService {
             }
         }
     }
-    
+    //문제 해결이 안된 모든 이에게 메시지 재 전송, ScheduldedNotificationSender class에서 사용
     public void resendMsgsToSpecificUsers() {
     	List<User> users = userService.findUsersHasUnresolvedAlerts();
     	Predicate<User> predicate = user -> isTimeForSendingMessages(user);

@@ -2,9 +2,6 @@ package com.example.aquarium.web.entity;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,7 +13,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import lombok.Builder;
 import lombok.Getter;
@@ -54,15 +50,7 @@ public class User {
 	@OneToMany(mappedBy="user",cascade = CascadeType.REMOVE)
 	@JsonIgnore
 	private List<Aquarium> aquariums; 
-	
-	@OneToMany(mappedBy="user",cascade = CascadeType.REMOVE)
-	@JsonIgnore
-	private List<BoardPost> posts;
-	
-	@OneToMany(mappedBy="user",cascade = CascadeType.REMOVE)
-	@JsonIgnore
-	private List<MarketingList> marketingList;
-	
+		
 	@OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
 	private List<Alert> alerts;
 	
@@ -78,21 +66,6 @@ public class User {
 		this.phoneNumber = phoneNumber;
 		this.password = password;
 	}
-	
-//	public void addAlert(Alert alert) {
-//	    this.alerts.add(alert);
-//	    alert.setUser(this);
-//	}
-//	
-//	public List<Notification> getNotifications() {
-//	    if (this.alerts == null) {
-//	        return List.of();
-//	    }
-//
-//	    return this.alerts.stream()
-//	        .map(Alert::getNotification)
-//	        .filter(Objects::nonNull)
-//	        .collect(Collectors.toList());
-//	}	
+
 	
 }

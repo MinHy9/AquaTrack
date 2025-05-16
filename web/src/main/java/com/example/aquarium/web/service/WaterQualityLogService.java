@@ -4,13 +4,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.aquarium.web.entity.Alert;
 import com.example.aquarium.web.entity.Aquarium;
 import com.example.aquarium.web.entity.WaterQualityLog;
+import com.example.aquarium.web.exception.AquariumNotFoundException;
 import com.example.aquarium.web.repository.WaterQualityLogRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -21,6 +20,7 @@ public class WaterQualityLogService {
 	
 	private final WaterQualityLogRepository waterQualityLogRepository;
 	private final UserService userService;
+	private final AquariumService aquariumService;
 	
 	public List<WaterQualityLog> checkWaterQualityLogAndMakeAbnormalLogs(Long userId) {
 	    List<Aquarium> aquariums = userService.findUserById(userId).getAquariums();
@@ -40,24 +40,9 @@ public class WaterQualityLogService {
 	    return abnormalLogs;
 	}
 
-
-//	public WaterQualityLog findLatestLog(Aquarium aquarium) {
-//	    return waterQualityLogRepository.findTopByAquariumOrderByRecordedAtDesc(aquarium);
-//	}
 	public List<WaterQualityLog> findRecentLogsByAquarium(Aquarium aquarium, int minutes) {
 	    LocalDateTime cutoff = LocalDateTime.now().minusMinutes(minutes);
 	    return waterQualityLogRepository.findByAquariumAndRecordedAtAfter(aquarium, cutoff);
-	}
-	public ResponseEntity<List<WaterQualityLog>> createWaterQualityLogs(List<WaterQualityLog> requestLogs) {
-	    List<WaterQualityLog> savedLogs = waterQualityLogRepository.saveAll(requestLogs);
-	    return ResponseEntity.ok(savedLogs);
-	}
-	public ResponseEntity<String> deleteWaterQualityLogById(Long userid){
-	    if (!waterQualityLogRepository.existsById(userid)) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 유저가 없습니다.");
-	    }
-	    waterQualityLogRepository.deleteById(userid);
-	    return ResponseEntity.ok("user 삭제 완료");
 	}
 	
 	public String generateMessage(WaterQualityLog log) {
@@ -93,6 +78,21 @@ public class WaterQualityLogService {
 
 	public List<WaterQualityLog> findByAquarium(Aquarium aquarium) {
 		return waterQualityLogRepository.findByAquarium(aquarium);
+	}
+	
+	public void saveLog(Long userId,Long aquariumId,float temperature,
+						float ph,float turbidity) {
+		Aquarium aquarium = aquariumService.getMyAquarirum(userId, aquariumId);
+		if (aquarium == null) {
+	        throw new AquariumNotFoundException("해당하는 사용자 아이디: " + userId + " 의 수조아이디: " + aquariumId + "로 조회한 결과가 없습니다.");
+	    }
+		WaterQualityLog waterQualityLog = WaterQualityLog.builder()
+														 .aquarium(aquarium)
+														 .ph(ph)
+														 .turbidity(turbidity)
+														 .temperature(temperature)
+														 .build();
+		waterQualityLogRepository.save(waterQualityLog);
 	}
 	
 

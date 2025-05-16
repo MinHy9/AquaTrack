@@ -31,13 +31,6 @@ public class AlertService {
 	    return alertRepository.save(alert);
 	}
 	
-	public ResponseEntity<String> deleteAlertById(Long alertid){
-		if(!alertRepository.existsById(alertid)) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 유저가 없습니다.");
-		}
-		alertRepository.deleteById(alertid);
-	    return ResponseEntity.ok("alert 삭제 완료");
-	}
 	public List<Alert> getUnresolvedAlerts(Long userId) {
 	    return alertRepository.findByUser_UserIdAndResolvedFalse(userId);
 	}	

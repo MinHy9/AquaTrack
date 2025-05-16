@@ -11,4 +11,5 @@ import com.example.aquarium.web.entity.User;
 @Repository
 public interface AquariumRepository extends JpaRepository<Aquarium, Long> {
 	List<Aquarium> findByUser(User user);
+	Aquarium findByUser_UserIdAndAquariumId(Long userid,Long aquaririumId);
 }

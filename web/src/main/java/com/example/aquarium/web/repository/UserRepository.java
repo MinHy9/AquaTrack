@@ -11,4 +11,5 @@ import com.example.aquarium.web.entity.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 	List<User> findAllBy();
 	List<User> findDistinctByAlertsResolvedFalse();
+	User findByUsername(String username);
 }

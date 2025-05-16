@@ -3,7 +3,6 @@ package com.example.aquarium.web.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import com.example.aquarium.web.entity.Aquarium;
 import com.example.aquarium.web.entity.User;
@@ -40,4 +39,8 @@ public class AquariumService {
 		}
         return aquariumRepository.findByUser(user);
     }
+	//mqtt 때 사용
+	public Aquarium getMyAquarirum(Long userId,Long aquariumd) {
+		return aquariumRepository.findByUser_UserIdAndAquariumId(userId, aquariumd);
+	}
 }

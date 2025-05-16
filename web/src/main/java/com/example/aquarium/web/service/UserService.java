@@ -45,4 +45,9 @@ public class UserService {
 	 public List<User> findUsersHasUnresolvedAlerts(){
 		 return userRepository.findDistinctByAlertsResolvedFalse();
 	 }
+	 public User findUserByUseranme(String username) {
+		 return userRepository.findByUsername(username);
+	 }
+	 
+
 }
