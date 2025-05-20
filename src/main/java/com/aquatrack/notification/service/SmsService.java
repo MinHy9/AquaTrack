@@ -4,46 +4,38 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.sns.SnsClient;
-import software.amazon.awssdk.services.sns.model.PublishRequest;
+
+import net.nurigo.sdk.NurigoApp;
+import net.nurigo.sdk.message.service.DefaultMessageService;
+import net.nurigo.sdk.message.model.Message;
 
 @Service
 @RequiredArgsConstructor
-public class SmsService { //aws sms 설정
-    @Value("${aws.access-key}")
-    private String accessKey;
+public class SmsService {
 
-    @Value("${aws.secret-key}")
+    @Value("${solapi.apiKey}")
+    private String apiKey;
+
+    @Value("${solapi.apiSecret}")
     private String secretKey;
 
-    @Value("${aws.region}")
-    private String region;
-
-    private SnsClient snsClient;
+    private DefaultMessageService messageService;
 
     @PostConstruct
-    public void init() {
-        AwsBasicCredentials awsCreds = AwsBasicCredentials.create(accessKey, secretKey);
-        this.snsClient = SnsClient.builder()
-                .region(Region.of(region))
-                .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
-                .build();
+    private void init() {
+        messageService = NurigoApp.INSTANCE.initialize(apiKey, secretKey, "https://api.solapi.com");
     }
 
-    public void sendSms(String phoneNumber, String message) {
+    public void sendSms(String phoneNumber, String messageText) {
         try {
-            PublishRequest request = PublishRequest.builder()
-                    .message(message)
-                    .phoneNumber(phoneNumber)
-                    .build();
+            Message message = new Message();
+            message.setFrom("01012345678"); // ✅ 본인 인증된 발신번호로 교체
+            message.setTo(phoneNumber);
+            message.setText(messageText);
 
-            snsClient.publish(request);
+            messageService.send(message);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("SMS 전송 실패: " + e.getMessage());
+            throw new RuntimeException("SMS 전송 실패: " + e.getMessage(), e);
         }
     }
 }
