@@ -58,8 +58,21 @@ public class ScheduledNotificationSender {
 
                 if (overTenMin && needsResend) {
                     String phone = log.getAquarium().getUser().getPhone();
-                    String msg = "[재경고] 센서 수치(온도/pH/탁도) 중 이상 상태가 10분 넘게 지속 중입니다.";
-                    smsService.sendSms(phone, msg);
+                    if (temperature < tempMin || temperature > tempMax) {
+                        String msg = String.format("[재경고] 현재 수온은 %.1f°C로 정상 범위를 벗어났습니다. 빨리 조치를 취해주세요.", temperature);
+                        smsService.sendSms(phone, msg);
+                    }
+
+                    if (pH < phMin || pH > phMax) {
+                        String msg = String.format("[재경고] 현재 pH는 %.1f로 정상 범위를 벗어났습니다. 빨리 조치를 취해주세요.", pH);
+                        smsService.sendSms(phone, msg);
+                    }
+
+                    if (turbidity > turbidityMax) {
+                        String msg = String.format("[재경고] 현재 탁도는 %.1f NTU로 정상 범위를 벗어났습니다. 빨리 조치를 취해주세요.", turbidity);
+                        smsService.sendSms(phone, msg);
+                    }
+
                     alertStatusTracker.updateAlertSentTime(aquariumId, now);
                     System.out.println("📨 재경고 전송됨: " + phone);
                 }

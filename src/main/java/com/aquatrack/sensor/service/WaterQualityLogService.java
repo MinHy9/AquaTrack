@@ -69,13 +69,21 @@ public class WaterQualityLogService {
         Aquarium a = log.getAquarium();
 
         if (log.getTemperature() < a.getCustomMinTemperature() || log.getTemperature() > a.getCustomMaxTemperature()) {
-            createAlert(log, AlertType.TEMPERATURE, "수온이 정상 범위를 벗어났습니다.");
+            double temp = log.getTemperature();
+            String msg = String.format("현재 수온은 %.1f°C로 정상 범위를 벗어났습니다.", temp);
+            createAlert(log, AlertType.TEMPERATURE, msg);
+
         }
         if (log.getPH() < a.getCustomMinPH() || log.getPH() > a.getCustomMaxPH()) {
-            createAlert(log, AlertType.PH, "pH 수치가 정상 범위를 벗어났습니다.");
+            double ph = log.getPH();
+            String msg = String.format("현재 pH는 %.1f로 정상 범위를 벗어났습니다.", ph);
+            createAlert(log, AlertType.PH, msg);
+
         }
         if (log.getTurbidity() > a.getCustomMaxTurbidity()) {
-            createAlert(log, AlertType.TURBIDITY, "탁도가 너무 높습니다.");
+            double turb = log.getTurbidity();
+            String msg = String.format("현재 탁도는 %.1f NTU로 정상 범위를 벗어났습니다.", turb);
+            createAlert(log, AlertType.TURBIDITY, msg);
         }
     }
 
