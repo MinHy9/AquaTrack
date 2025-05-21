@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,5 +50,7 @@ public interface WaterQualityLogRepository extends JpaRepository<WaterQualityLog
     //실시간 센서값
     Optional<WaterQualityLog> findTopByAquarium_User_EmailOrderByRecordedAtDesc(String email);
 
+    //경고 재전송에 필요한 시간값
+    List<WaterQualityLog> findByRecordedAtAfter(LocalDateTime time);
 
 }

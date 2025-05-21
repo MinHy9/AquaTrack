@@ -34,6 +34,7 @@ public class AquariumController {
         return ResponseEntity.ok(aquariumService.getMyAquariums(email));
     }
 
+    //온도,탁도,pH설정 기준값 설정
     @PutMapping("/{aquariumId}/thresholds")
     public ResponseEntity<String> updateThresholds(@PathVariable Long aquariumId,
                                                    @RequestBody AquariumThresholdUpdateRequest req) {
