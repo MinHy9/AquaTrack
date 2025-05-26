@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 public class MqttService {
     private final MqttClient mqttClient;
 
+    //메시지 publish 담당
     public void publish(String topic, String message) {
         try {
             MqttMessage mqttMessage = new MqttMessage();

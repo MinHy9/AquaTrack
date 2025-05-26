@@ -26,4 +26,15 @@ public class Aquarium {
 
     @CreationTimestamp
     private LocalDateTime registeredDate;
+
+    private String fishName;
+
+    private Float customMinTemperature;
+    private Float customMaxTemperature;
+
+    private Float customMinPH;
+    private Float customMaxPH;
+
+    private Float customMaxTurbidity;
+
 }

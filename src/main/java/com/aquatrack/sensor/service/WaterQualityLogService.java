@@ -54,20 +54,36 @@ public class WaterQualityLogService {
         return logRepository.findTop10ByAquariumOrderByRecordedAtDesc(aquarium);
     }
 
+    //사용자기준값에 따라 자동급식 판단
     private boolean isWaterConditionNormal(WaterQualityLog log) {
-        return log.getTemperature() >= 23.0 && log.getTemperature() <= 28.0 &&
-                log.getPH() >= 6.5 && log.getPH() <= 8.0 &&
-                log.getTurbidity() <= 300.0;
+        Aquarium a = log.getAquarium();
+
+        return log.getTemperature() >= a.getCustomMinTemperature() &&
+                log.getTemperature() <= a.getCustomMaxTemperature() &&
+                log.getPH() >= a.getCustomMinPH() &&
+                log.getPH() <= a.getCustomMaxPH() &&
+                log.getTurbidity() <= a.getCustomMaxTurbidity();
     }
+
     private void checkAndCreateAlerts(WaterQualityLog log) {
-        if (log.getTemperature() < 23.0 || log.getTemperature() > 28.0) {
-            createAlert(log, AlertType.TEMPERATURE, "수온이 정상 범위를 벗어났습니다.");
+        Aquarium a = log.getAquarium();
+
+        if (log.getTemperature() < a.getCustomMinTemperature() || log.getTemperature() > a.getCustomMaxTemperature()) {
+            double temp = log.getTemperature();
+            String msg = String.format("현재 수온은 %.1f°C로 정상 범위를 벗어났습니다.", temp);
+            createAlert(log, AlertType.TEMPERATURE, msg);
+
         }
-        if (log.getPH() < 6.5 || log.getPH() > 8.0) {
-            createAlert(log, AlertType.PH, "pH 수치가 정상 범위를 벗어났습니다.");
+        if (log.getPH() < a.getCustomMinPH() || log.getPH() > a.getCustomMaxPH()) {
+            double ph = log.getPH();
+            String msg = String.format("현재 pH는 %.1f로 정상 범위를 벗어났습니다.", ph);
+            createAlert(log, AlertType.PH, msg);
+
         }
-        if (log.getTurbidity() > 300.0) {
-            createAlert(log, AlertType.TURBIDITY, "탁도가 너무 높습니다.");
+        if (log.getTurbidity() > a.getCustomMaxTurbidity()) {
+            double turb = log.getTurbidity();
+            String msg = String.format("현재 탁도는 %.1f NTU로 정상 범위를 벗어났습니다.", turb);
+            createAlert(log, AlertType.TURBIDITY, msg);
         }
     }
 

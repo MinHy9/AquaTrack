@@ -1,4 +1,4 @@
-package com.aquatrack.sensor.controller;
+/*package com.aquatrack.sensor.controller;
 
 import com.aquatrack.sensor.dto.WaterQualityLogRequest;
 import com.aquatrack.sensor.entity.WaterQualityLog;
@@ -27,4 +27,6 @@ public class WaterQualityLogController {
     public ResponseEntity<List<WaterQualityLog>> getLogs(@PathVariable Long aquariumId) {
         return ResponseEntity.ok(waterService.getRecentLogs(aquariumId));
     }
-}
+}*/
+
+//http post 방식에서 mqtt방식으로 전환했으므로 주석처리함

@@ -10,7 +10,7 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    private final String SECRET_KEY = "aquatrack-secret-key"; // 실제 배포 시 환경변수로
+    private final String SECRET_KEY = "my-super-secure-secret-key-which-is-very-long-and-secure-EXTRA1234567890KEYVALUE"; // 실제 배포 시 환경변수로
 
     // 토큰 유효시간: 1시간
     private final long EXPIRATION_TIME = 60 * 60 * 1000;

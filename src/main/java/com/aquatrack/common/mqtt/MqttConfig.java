@@ -17,14 +17,34 @@ public class MqttConfig {
     @Value("${mqtt.client-id}")
     private String clientId;
 
+    @Value("${mqtt.cert.ca}")
+    private String caCertPath;
+
+    @Value("${mqtt.cert.crt}")
+    private String clientCertPath;
+
+    @Value("${mqtt.cert.key}")
+    private String privateKeyPath;
+
     @Bean
-    public MqttClient mqttClient() throws MqttException {
+    public MqttClient mqttClient() throws Exception {
         MqttClient client = new MqttClient(broker, clientId, new MemoryPersistence());
 
         MqttConnectOptions options = new MqttConnectOptions();
         options.setCleanSession(true);
+        options.setSocketFactory(AwsIotMqttUtil.getSocketFactory(
+                caCertPath,
+                clientCertPath,
+                privateKeyPath
+        ));
 
         client.connect(options);
+
+        // 구독 설정
+       /* client.subscribe("aquatrack/+/sensor", (topic, msg) -> {
+            String payload = new String(msg.getPayload());
+            System.out.println("💡 수신됨: [" + topic + "] " + payload);
+        });*/
 
         return client;
     }

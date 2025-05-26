@@ -1,6 +1,7 @@
 package com.aquatrack.aquarium.controller;
 
 import com.aquatrack.aquarium.dto.AquariumRequest;
+import com.aquatrack.aquarium.dto.AquariumThresholdUpdateRequest;
 import com.aquatrack.aquarium.entity.Aquarium;
 import com.aquatrack.aquarium.service.AquariumService;
 import jakarta.validation.Valid;
@@ -31,5 +32,13 @@ public class AquariumController {
     public ResponseEntity<List<Aquarium>> getMyAquariums() {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return ResponseEntity.ok(aquariumService.getMyAquariums(email));
+    }
+
+    //온도,탁도,pH설정 기준값 설정
+    @PutMapping("/{aquariumId}/thresholds")
+    public ResponseEntity<String> updateThresholds(@PathVariable Long aquariumId,
+                                                   @RequestBody AquariumThresholdUpdateRequest req) {
+        aquariumService.updateThresholds(aquariumId, req);
+        return ResponseEntity.ok("기준값 수정 완료");
     }
 }
