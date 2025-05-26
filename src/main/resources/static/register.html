@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>어항 등록 | Aqua Track</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+<div class="max-w-md mx-auto bg-white p-6 rounded shadow">
+  <h2 class="text-xl font-bold mb-4">어항 등록</h2>
+  <label class="block mb-2">어항 이름</label>
+  <input id="aq-name" type="text" class="w-full p-2 mb-4 border rounded" placeholder="어항 이름"/>
+  <label class="block mb-2">소유자</label>
+  <input id="aq-owner" type="text" class="w-full p-2 mb-4 border rounded" placeholder="소유자"/>
+  <button
+          id="register-btn"
+          class="w-full bg-blue-500 hover:bg-blue-600 text-white p-2 rounded"
+  >
+    등록하기
+  </button>
+  <div class="mt-4 text-center">
+    <a href="index.html" class="text-sm text-gray-600 hover:underline">어항 목록으로 돌아가기</a>
+  </div>
+</div>
+
+<script>
+  document.getElementById('register-btn').addEventListener('click', () => {
+    const name  = document.getElementById('aq-name').value.trim();
+    const owner = document.getElementById('aq-owner').value.trim();
+    if (!name || !owner) {
+      alert('모든 필드를 입력해주세요.');
+      return;
+    }
+    fetch('/api/aquarium/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, owner })
+    })
+            .then(res => {
+              if (!res.ok) throw new Error(res.statusText);
+              return res.json();
+            })
+            .then(json => {
+              alert(`등록 완료! 어항 ID: ${json.id}`);
+              location.href = 'index.html';
+            })
+            .catch(err => {
+              alert('등록 실패: ' + err);
+            });
+  });
+</script>
+</body>
+</html>
