@@ -50,11 +50,19 @@ public class AquariumService {
         return aquariumRepository.save(aquarium);
     }
 
+    //모든 어항 조회
     public List<Aquarium> getMyAquariums(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
 
         return aquariumRepository.findByUser(user);
+    }
+
+    //id로 어항찾기
+    public Long getAquariumIdByUser(Long userId) {
+        return aquariumRepository.findByUser_UserId(userId)
+                .map(aquarium -> aquarium.getAquariumId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저의 어항이 없습니다."));
     }
 
     //기준값 수정 API
