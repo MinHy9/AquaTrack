@@ -183,12 +183,24 @@
                 <button class="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-button mt-4 whitespace-nowrap">
                     수동 급식
                 </button>
-                <button class="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-button mt-2 whitespace-nowrap">
-                    냉각팬 작동
-                </button>
-                <button class="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-button mt-2 whitespace-nowrap">
-                    환수팬 작동
-                </button>
+                <!-- 냉각팬 작동/끄기 -->
+                <div class="flex space-x-2 mt-2">
+                    <button class="w-1/2 bg-primary hover:bg-primary/90 text-white py-3 rounded-button whitespace-nowrap">
+                        냉각팬 작동
+                    </button>
+                    <button class="w-1/2 bg-red-500 hover:bg-red-600 text-white py-3 rounded-button whitespace-nowrap">
+                        냉각팬 끄기
+                    </button>
+                </div>
+                <!-- 환수팬 작동/끄기 -->
+                <div class="flex space-x-2 mt-2">
+                    <button class="w-1/2 bg-primary hover:bg-primary/90 text-white py-3 rounded-button whitespace-nowrap">
+                        환수팬 작동
+                    </button>
+                    <button class="w-1/2 bg-red-500 hover:bg-red-600 text-white py-3 rounded-button whitespace-nowrap">
+                        환수팬 끄기
+                    </button>
+                </div>
             </div>
         </div>
         <!-- 환경 설정 카드 -->
