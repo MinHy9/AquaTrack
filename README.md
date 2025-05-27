@@ -56,3 +56,12 @@
     - MqttConfig: 연결 설정
     - AwsIotMqttUtil: 메시지 구성 및 유틸 기능
 
+11. WebSocket 실시간 전송
+- 역할: 수신한 센서값을 프론트엔드에 실시간으로 전송 (실시간 수온/pH/탁도 확인)
+- 주요 클래스:
+  - WebSocketConfig: /ws 엔드포인트 및 메시지 브로커 설정
+  - SensorSocketSender: /topic/sensor로 STOMP 메시지 전송
+- 흐름 요약:
+  1. ESP32 → AWS IoT Core로 MQTT Publish
+  2. Spring → MqttSensorSubscriber에서 수신 후 DB 저장
+  3. 상태 판단 후 SensorSocketSender를 통해 WebSocket 푸시
