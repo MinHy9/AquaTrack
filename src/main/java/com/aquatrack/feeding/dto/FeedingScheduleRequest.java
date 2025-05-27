@@ -1,5 +1,7 @@
 package com.aquatrack.feeding.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,5 +12,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FeedingScheduleRequest {
     private Long aquariumId;
-    private String time;
+    private List<String> timeList;
 }

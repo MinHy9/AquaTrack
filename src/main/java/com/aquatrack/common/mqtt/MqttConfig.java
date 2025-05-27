@@ -43,6 +43,7 @@ public class MqttConfig {
         // 구독 설정
        /* client.subscribe("aquatrack/+/sensor", (topic, msg) -> {
             String payload = new String(msg.getPayload());
+            
             System.out.println("💡 수신됨: [" + topic + "] " + payload);
         });*/
 

@@ -1,20 +1,23 @@
 package com.aquatrack.sensor.service;
 
-import com.aquatrack.sensor.dto.WaterQualityLogRequest;
-import com.aquatrack.alert.entity.Alert;
-import com.aquatrack.alert.entity.AlertType;
-import com.aquatrack.aquarium.entity.Aquarium;
-import com.aquatrack.sensor.entity.WaterQualityLog;
-import com.aquatrack.alert.repository.AlertRepository;
-import com.aquatrack.aquarium.repository.AquariumRepository;
-import com.aquatrack.sensor.repository.WaterQualityLogRepository;
-import com.aquatrack.feeding.service.FeedingStateService;
-import com.aquatrack.notification.service.NotificationService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.aquatrack.alert.entity.Alert;
+import com.aquatrack.alert.entity.AlertType;
+import com.aquatrack.alert.repository.AlertRepository;
+import com.aquatrack.aquarium.entity.Aquarium;
+import com.aquatrack.aquarium.repository.AquariumRepository;
+import com.aquatrack.feeding.service.FeedingStateService;
+import com.aquatrack.notification.service.NotificationService;
+import com.aquatrack.sensor.dto.WaterQualityLogRequest;
+import com.aquatrack.sensor.entity.WaterQualityLog;
+import com.aquatrack.sensor.repository.WaterQualityLogRepository;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +27,11 @@ public class WaterQualityLogService {
     private final FeedingStateService feedingStateService;
     private final AlertRepository alertRepository;
     private final NotificationService notificationService;
+    private final SimpMessagingTemplate messagingTemplate;
+    
+    public void sendAll(@Valid WaterQualityLogRequest request) {
+    	messagingTemplate.convertAndSend("aquatrack/sensor",request);
+    }
 
     public WaterQualityLog save(@Valid WaterQualityLogRequest request) {
         Aquarium aquarium = aquariumRepository.findById(request.getAquariumId())

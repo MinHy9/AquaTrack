@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -19,6 +20,8 @@ public class WaterQualityLogController {
     // 센서 데이터 저장
     @PostMapping
     public ResponseEntity<WaterQualityLog> save(@RequestBody @Valid WaterQualityLogRequest request) {
+    	request.setRecoredAt(LocalDateTime.now());
+    	waterService.sendAll(request);
         return ResponseEntity.ok(waterService.save(request));
     }
 

@@ -41,4 +41,13 @@ public class AquariumController {
         aquariumService.updateThresholds(aquariumId, req);
         return ResponseEntity.ok("기준값 수정 완료");
     }
+    
+    //어종 설정
+    @PutMapping("/{aquariumId}/fish")
+    public ResponseEntity<String> updateFishType(@PathVariable Long aquariumId,@Valid AquariumRequest request){
+    	aquariumService.updateFishType(aquariumId, request);
+    	return ResponseEntity.ok("어종 수정 완료");
+    }
+
+    
 }

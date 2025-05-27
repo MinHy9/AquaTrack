@@ -78,4 +78,11 @@ public class AquariumService {
 
         aquariumRepository.save(a);
     }
+    //어종 수정
+    public void updateFishType(Long aquariumId,AquariumRequest req) {
+    	 Aquarium a = aquariumRepository.findById(aquariumId)
+                 .orElseThrow(() -> new RuntimeException("어항을 찾을 수 없습니다."));
+    	 a.setFishName(req.getFishName());
+    	 aquariumRepository.save(a);
+    }
 }

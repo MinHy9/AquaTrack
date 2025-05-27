@@ -1,5 +1,7 @@
 package com.aquatrack.sensor.dto;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,4 +15,5 @@ public class WaterQualityLogRequest {
     private Float temperature;
     private Float pH;
     private Float turbidity;
+    private LocalDateTime recoredAt;
 }

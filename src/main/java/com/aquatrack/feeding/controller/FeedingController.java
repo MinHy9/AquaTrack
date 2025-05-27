@@ -1,14 +1,21 @@
 package com.aquatrack.feeding.controller;
 
-import com.aquatrack.feeding.dto.FeedingScheduleRequest;
-import com.aquatrack.feeding.entity.FeedingSchedule;
-import com.aquatrack.feeding.service.FeedingService;
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.aquatrack.feeding.dto.FeedingScheduleRequest;
+import com.aquatrack.feeding.service.FeedingService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/feeding")
@@ -32,7 +39,7 @@ public class FeedingController {
 
     // 현재 스케줄 조회
     @GetMapping("/schedule/{aquariumId}")
-    public ResponseEntity<List<FeedingSchedule>> getSchedules(@PathVariable Long aquariumId) {
+    public ResponseEntity<Map<String, LocalDateTime>> getSchedules(@PathVariable Long aquariumId) {
         return ResponseEntity.ok(feedingService.getSchedules(aquariumId));
     }
 }
