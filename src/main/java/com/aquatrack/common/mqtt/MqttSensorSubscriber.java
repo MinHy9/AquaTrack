@@ -1,6 +1,8 @@
 package com.aquatrack.common.mqtt;
 
+import com.aquatrack.common.websocket.SensorSocketSender;
 import com.aquatrack.sensor.dto.WaterQualityLogRequest;
+import com.aquatrack.sensor.entity.WaterQualityLog;
 import com.aquatrack.sensor.service.WaterQualityLogService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -19,6 +21,7 @@ public class MqttSensorSubscriber {
     private final MqttClient mqttClient;
     private final WaterQualityLogService logService;
     private final ObjectMapper objectMapper;
+    private final SensorSocketSender sensorSocketSender; // ✅ WebSocket 푸시용
 
     @PostConstruct
     public void subscribeToSensorData() {
@@ -31,8 +34,9 @@ public class MqttSensorSubscriber {
                     // 1. JSON 파싱 → DTO
                     WaterQualityLogRequest request = objectMapper.readValue(payload, WaterQualityLogRequest.class);
 
-                    // 2. 기존 저장 로직 호출
-                    logService.save(request);
+                    // 2. 저장 및 WebSocket 푸시
+                    WaterQualityLog savedLog = logService.save(request); // 저장
+                    sensorSocketSender.send(savedLog); // ✅ WebSocket 실시간 전송
 
                 } catch (Exception e) {
                     log.error("❌ 센서 메시지 파싱 실패: {}", e.getMessage());

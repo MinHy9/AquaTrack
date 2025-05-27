@@ -29,21 +29,25 @@ public class WaterQualityLogService {
         Aquarium aquarium = aquariumRepository.findById(request.getAquariumId())
                 .orElseThrow(() -> new RuntimeException("어항을 찾을 수 없습니다."));
 
+        // 1. 상태 판별(status 저장됨)
+        boolean isNormal = isWaterConditionNormal(aquarium, request);
+
         WaterQualityLog log = WaterQualityLog.builder()
                 .aquarium(aquarium)
                 .temperature(request.getTemperature())
                 .pH(request.getPH())
                 .turbidity(request.getTurbidity())
+                .status(isNormal ? "NORMAL" : "DANGER")
                 .build();
 
         WaterQualityLog savedLog = logRepository.save(log);
 
-        // 이상 상태 체크 및 Alert 생성
+        // 2. 이상 상태 체크 및 Alert 생성
         checkAndCreateAlerts(savedLog);
 
         // 자동급식 가능 여부 판단
-        boolean isNormal = isWaterConditionNormal(savedLog);
-        feedingStateService.setAutoFeedingEnabled(aquarium.getAquariumId(), isNormal);
+        boolean feedingAvailable = isWaterConditionNormal(savedLog);
+        feedingStateService.setAutoFeedingEnabled(aquarium.getAquariumId(), feedingAvailable);
 
         return savedLog;
     }
@@ -54,10 +58,18 @@ public class WaterQualityLogService {
         return logRepository.findTop10ByAquariumOrderByRecordedAtDesc(aquarium);
     }
 
-    //사용자기준값에 따라 자동급식 판단
+    // status 판별용
+    private boolean isWaterConditionNormal(Aquarium a, WaterQualityLogRequest request) {
+        return request.getTemperature() >= a.getCustomMinTemperature() &&
+                request.getTemperature() <= a.getCustomMaxTemperature() &&
+                request.getPH() >= a.getCustomMinPH() &&
+                request.getPH() <= a.getCustomMaxPH() &&
+                request.getTurbidity() <= a.getCustomMaxTurbidity();
+    }
+
+    // 급식 판단용
     private boolean isWaterConditionNormal(WaterQualityLog log) {
         Aquarium a = log.getAquarium();
-
         return log.getTemperature() >= a.getCustomMinTemperature() &&
                 log.getTemperature() <= a.getCustomMaxTemperature() &&
                 log.getPH() >= a.getCustomMinPH() &&
