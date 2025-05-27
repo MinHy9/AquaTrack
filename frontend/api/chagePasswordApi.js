@@ -14,7 +14,7 @@ document.getElementById('change-password-btn').addEventListener('click', async()
 
        try{
          const response = await apiClient.put("/auth/newPassword",{
-            password : pw2,
+            newPassword : pw2,
          })
             alert(response.data);
             location.href = 'index.html';

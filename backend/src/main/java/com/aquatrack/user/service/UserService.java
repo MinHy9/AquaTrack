@@ -1,5 +1,6 @@
 package com.aquatrack.user.service;
 
+import com.aquatrack.email.service.EmailService;
 import com.aquatrack.user.dto.UserLoginRequest;
 import com.aquatrack.user.dto.UserRegisterRequest;
 import com.aquatrack.user.entity.User;
@@ -9,12 +10,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Random;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     //회원가입 기능
     public void register(UserRegisterRequest request) {
@@ -51,6 +55,36 @@ public class UserService {
         JwtTokenProvider jwtTokenProvider = new JwtTokenProvider();
         return jwtTokenProvider.createToken(user.getEmail());
     }
+
+    //비밀번호 변경
+    public void changePassword(User user, String newPassword) {
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+    //비밀번호 리셋
+    public void resetPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 이메일입니다."));
+
+        String tempPassword = generateRandomPassword();
+        user.setPassword(passwordEncoder.encode(tempPassword));
+        userRepository.save(user);
+
+        emailService.sendPasswordResetEmail(email, tempPassword);
+    }
+    //임시비밀번호생성
+    private String generateRandomPassword() {
+        int length = 10;
+        String charSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder password = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            password.append(charSet.charAt(random.nextInt(charSet.length())));
+        }
+        return password.toString();
+    }
+
 
 
 }
