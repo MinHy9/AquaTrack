@@ -27,6 +27,9 @@ public class WaterQualityLog {
     private Float pH;
     private Float turbidity;
 
+    @Column(nullable = false)
+    private String status;
+
     @CreationTimestamp
     private LocalDateTime recordedAt;
 }
