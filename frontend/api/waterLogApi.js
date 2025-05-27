@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
         let turbidityData = [];
 
         multiChart.setOption(multiOption);
-        stompClient.subscribe(`/aquatrack/sensor`, function (message) {
+        stompClient.subscribe(`/topic/sensor`, function (message) {
             const data = JSON.parse(message.body);
             const recordedTime = new Date(data.recordedAt);
             let timeLabel = getTimeLabel(recordedTime);

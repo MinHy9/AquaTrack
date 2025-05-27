@@ -72,21 +72,21 @@ async function tryDrawChart(){
     const range = activeRange.dataset.range;
 
     const waterData = await getWaterStats(range);
-    
-    const timeLabel = waterData.map(data => {
-        const label = data.dateLabel;
-         if(typeof label === 'string'){
-            if(label.includes('-')){
+
+    const labelList = waterData.categories;
+    const timeLabel = labelList.map(label => {
+        if (typeof label === 'string') {
+            if (label.includes('-')) {
                 const parts = label.split('-');
                 const month = parseInt(parts[1], 10);
                 return `${month}월`;
-            }else{
+            } else {
                 return getMonthWeekLabel(label);
             }
-         }else{
+        } else {
             return label;
-         }
-    })
+        }
+    });
     
     switch(metric){
         case "turbidity":
