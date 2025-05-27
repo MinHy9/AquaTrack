@@ -10,5 +10,5 @@ import java.util.List;
 public interface FeedingScheduleRepository extends JpaRepository<FeedingSchedule, Long> {
     List<FeedingSchedule> findByAquariumAndEnabledTrue(Aquarium aquarium);
 
-    List<FeedingSchedule> findByTime(LocalTime time); // 시간 일치하는 스케줄 조회
+    List<FeedingSchedule> findByTime(String time); // 시간 일치하는 스케줄 조회
 }

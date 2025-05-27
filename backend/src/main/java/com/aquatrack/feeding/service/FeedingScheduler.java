@@ -23,7 +23,8 @@ public class FeedingScheduler {
     @Scheduled(fixedRate = 60000) // 매 1분마다 실행
     public void executeFeedingSchedules() {
         LocalTime now = LocalTime.now().truncatedTo(ChronoUnit.MINUTES);
-        List<FeedingSchedule> dueSchedules = scheduleRepository.findByTime(now);
+        String timeStr = now.toString(); // 예: "12:30"
+        List<FeedingSchedule> dueSchedules = scheduleRepository.findByTime(timeStr);
 
         for (FeedingSchedule schedule : dueSchedules) {
             Long aquariumId = schedule.getAquarium().getAquariumId();
