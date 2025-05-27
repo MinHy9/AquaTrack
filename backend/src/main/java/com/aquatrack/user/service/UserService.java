@@ -20,6 +20,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
+
     //회원가입 기능
     public void register(UserRegisterRequest request) {
         // 이메일/아이디 중복 확인
@@ -29,6 +30,17 @@ public class UserService {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
         }
+
+        // 1. 비밀번호 형식 검사
+        if (!isValidPasswordFormat(request.getPassword())) {
+            throw new IllegalArgumentException("비밀번호는 영문자, 숫자를 포함하여 8자 이상이어야 합니다.");
+        }
+
+        // 2. 같은 문자 4번 이상 반복 검사
+        if (hasRepeatedCharacters(request.getPassword())) {
+            throw new IllegalArgumentException("같은 문자를 4번 이상 연속해서 사용할 수 없습니다.");
+        }
+
 
         // 비밀번호 암호화 후 저장
         String encodedPassword = passwordEncoder.encode(request.getPassword());
@@ -83,6 +95,14 @@ public class UserService {
             password.append(charSet.charAt(random.nextInt(charSet.length())));
         }
         return password.toString();
+    }
+
+    private boolean isValidPasswordFormat(String password) {
+        return password != null && password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$");
+    }
+
+    private boolean hasRepeatedCharacters(String password) {
+        return password != null && password.matches(".*(.)\\1{3,}.*");
     }
 
 
