@@ -1,12 +1,12 @@
 import apiClient from './apiClient.js'
 const pumpOnButton = document.getElementById("water_pan_on");
-const aquariumId = document.getElementById("env-aquarium-id");
 const coolOnButton = document.getElementById("cooling_pan_on");
 const pupmOffButton = document.getElementById("water_pan_off");
 const coolOfButton = document.getElementById("cooling_pan_off");
+const aquaId = localStorage.getItem("selectedAquaId");
 
 function getAquariumId() {
-    return Number(aquariumId.value);
+    return Number(aquaId);
 }
 
 pupmOffButton.addEventListener("click",async()=>{
@@ -57,6 +57,3 @@ coolOfButton.addEventListener("click",async() =>{
         alert(error.response?.data?.message || "제어 요청 실패");
     }
 })
-
-
-
