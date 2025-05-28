@@ -2,7 +2,7 @@ import apiClient from './apiClient.js'
 const manualFeedingButton = document.getElementById("manual_feeding");
 manualFeedingButton.addEventListener("click",async()=>{
     try {
-        const aquariumId = Number(document.getElementById("env-aquarium-id").value);
+        const aquariumId = Number(localStorage.getItem("selectedAquaId"));
         const response = await apiClient.post(`/feeding/manual/${aquariumId}`);
         alert(response.data);
     } catch (error) {
@@ -19,10 +19,10 @@ function formatTime(date) {
     return `${month}월 ${day}일 ${hours}:${minutes}`;
 }
 
-const schedulingSearchButton = document.getElementById("env-fetch-btn");
-schedulingSearchButton.addEventListener("click", async () => {
+document.addEventListener("DOMContentLoaded",async()=>{
+     
     try {
-        const aquariumId = Number(document.getElementById("env-aquarium-id").value);
+        const aquariumId = Number(localStorage.getItem("selectedAquaId"));
         const lastFeeding = document.getElementById("last_feeding");
         const nextFeeding = document.getElementById("next_feeding");
 
@@ -49,7 +49,6 @@ schedulingSearchButton.addEventListener("click", async () => {
             alert("급식 주기를 가져올 수 없습니다.");
         }
     }
-});
-
+})
 
 
