@@ -12,8 +12,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <!-- WebSocket (SockJS) 지원 추가 -->
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <style>
         :where([class^="ri-"])::before { content: "\f3c2"; }
         body {
@@ -180,15 +178,6 @@
         <div class="bg-white rounded shadow-sm p-6">
             <h2 class="text-xl font-bold text-gray-800 mb-6">급식 관리</h2>
             <div class="space-y-4">
-                <div class="flex items-center space-x-2 mb-4">
-                    <input id="env-aquarium-id" type="text"
-                            placeholder="어항 ID 입력"
-                            class="flex-1 bg-gray-100 border rounded p-2 text-sm" />
-                    <button id="env-fetch-btn"
-                        class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90 text-sm whitespace-nowrap">
-                        조회
-                    </button>
-                </div>
                 <div class="flex justify-between items-center">
                     <div class="text-gray-700">마지막 급식</div>
                     <div id="last_feeding" class="text-gray-900 font-medium"></div>
@@ -224,11 +213,6 @@
             <h2 class="text-xl font-bold text-gray-800 mb-6">환경 설정</h2>
             <div class="space-y-4">
                 <div>
-                    <div class="flex items-center space-x-2 mb-4">
-                        <input id="env-aquarium-id" type="text"
-                            placeholder="어항 ID 입력"
-                            class="flex-1 bg-gray-100 border rounded p-2 text-sm" />
-                    </div>
                     <label class="block text-gray-700 mb-2">어종 선택</label>
                     <select id="fish_type" class="w-full bg-gray-100 border-none rounded p-3">
                         <option>구피</option>
@@ -294,7 +278,7 @@
     </div>
 </div>
 <script src="date.js"></script>
-<script src="./api/waterLogApi.js"></script>
+<script type="module" src="./api/waterLogApi.js"></script>
 <script type="module" src="./api/waterStatsApi.js"></script>
 <script type="module" src="./api/waterFigureApi.js"></script>
 <script type="module" src="./api/FeedingSchedule.js"></script>
