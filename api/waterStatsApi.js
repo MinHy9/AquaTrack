@@ -1,5 +1,15 @@
 import apiClient from './apiClient.js'
 
+let singleChart;
+document.addEventListener("DOMContentLoaded",async()=>{
+    try{
+        singleChart = echarts.init(document.getElementById('singleChart'));
+        makeChartForm([],[]);
+    }catch(error){
+        console.error("에러");
+    }
+})
+
 async function getWaterStats(range){
     const dailyStats = await apiClient.get(`/chart/${range}`);
     return dailyStats.data;
@@ -21,6 +31,8 @@ document.querySelectorAll('.range-btn').forEach(btn => {
         tryDrawChart(); 
     });
 });
+
+
 
 function getMonthWeekLabel(weekLabel) {
     // 예: "2025-W13" 또는 "2025W13"
