@@ -1,5 +1,15 @@
 import apiClient from './apiClient.js'
 
+let singleChart;
+document.addEventListener("DOMContentLoaded",async()=>{
+    try{
+        singleChart = echarts.init(document.getElementById('singleChart'));
+        makeChartForm([],[]);
+    }catch(error){
+        console.error("에러");
+    }
+})
+
 async function getWaterStats(range){
     const dailyStats = await apiClient.get(`/chart/${range}`);
     return dailyStats.data;
@@ -21,6 +31,8 @@ document.querySelectorAll('.range-btn').forEach(btn => {
         tryDrawChart(); 
     });
 });
+
+
 
 function getMonthWeekLabel(weekLabel) {
     // 예: "2025-W13" 또는 "2025W13"
@@ -72,21 +84,21 @@ async function tryDrawChart(){
     const range = activeRange.dataset.range;
 
     const waterData = await getWaterStats(range);
-
-    const labelList = waterData.categories;
-    const timeLabel = labelList.map(label => {
-        if (typeof label === 'string') {
-            if (label.includes('-')) {
+    
+    const timeLabel = waterData.map(data => {
+        const label = data.dateLabel;
+         if(typeof label === 'string'){
+            if(label.includes('-')){
                 const parts = label.split('-');
                 const month = parseInt(parts[1], 10);
                 return `${month}월`;
-            } else {
+            }else{
                 return getMonthWeekLabel(label);
             }
-        } else {
+         }else{
             return label;
-        }
-    });
+         }
+    })
     
     switch(metric){
         case "turbidity":

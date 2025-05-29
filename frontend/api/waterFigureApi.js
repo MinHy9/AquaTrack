@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const saveBtn = document.getElementById("save-config-btn");
 
 saveBtn.addEventListener('click', async () => {
-    let aquariumId = Number(document.getElementById("env-aquarium-id").value);
+    const aquariumId = Number(localStorage.getItem("selectedAquaId"));
     const fishType = document.getElementById("fish_type").value;
     const minTemperature = document.getElementById("cfg-temp-min").value;
     const maxTemperature = document.getElementById("cfg-temp-max").value;
