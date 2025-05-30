@@ -1,5 +1,6 @@
 package com.aquatrack.sensor.service;
 
+import com.aquatrack.common.security.CustomUserDetails;
 import com.aquatrack.sensor.dto.WaterQualityLogRequest;
 import com.aquatrack.alert.entity.Alert;
 import com.aquatrack.alert.entity.AlertType;
@@ -25,9 +26,10 @@ public class WaterQualityLogService {
     private final AlertRepository alertRepository;
     private final NotificationService notificationService;
 
-    public WaterQualityLog save(@Valid WaterQualityLogRequest request) {
+    public WaterQualityLog save(WaterQualityLogRequest request) {
         Aquarium aquarium = aquariumRepository.findById(request.getAquariumId())
-                .orElseThrow(() -> new RuntimeException("어항을 찾을 수 없습니다."));
+                .filter(a -> a.getUser().getUserId().toString().equals(request.getUserId()))
+                .orElseThrow(() -> new RuntimeException("MQTT 메시지 사용자와 어항 소유자가 일치하지 않습니다."));
 
         // 1. 상태 판별(status 저장됨)
         boolean isNormal = isWaterConditionNormal(aquarium, request);

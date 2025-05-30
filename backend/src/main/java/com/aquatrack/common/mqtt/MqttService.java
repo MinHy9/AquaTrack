@@ -22,4 +22,10 @@ public class MqttService {
             throw new RuntimeException("MQTT 전송 실패: " + e.getMessage());
         }
     }
+    // 발행시 topic 구조 변경 userId 추가
+    public void publishToDevice(String userId, Long aquariumId, String device, String message) {
+        String topic = "aquatrack/" + userId + "/" + aquariumId + "/" + device;
+        publish(topic, message);
+    }
+
 }

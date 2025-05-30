@@ -9,6 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WaterQualityLogRequest {
+    private String userId;
     private Long aquariumId;
     private Float temperature;
     private Float pH;

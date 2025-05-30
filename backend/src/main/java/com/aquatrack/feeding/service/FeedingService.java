@@ -1,5 +1,6 @@
 package com.aquatrack.feeding.service;
 
+import com.aquatrack.common.security.CustomUserDetails;
 import com.aquatrack.feeding.dto.FeedingScheduleRequest;
 import com.aquatrack.aquarium.entity.Aquarium;
 import com.aquatrack.feeding.entity.FeedingSchedule;
@@ -20,8 +21,9 @@ public class FeedingService {
     private final MqttService mqttService; // IoT 통신용 서비스
 
     // 자동 급여 스케줄 등록
-    public FeedingSchedule registerSchedule(FeedingScheduleRequest request) {
+    public FeedingSchedule registerSchedule(FeedingScheduleRequest request, CustomUserDetails userDetails) {
         Aquarium aquarium = aquariumRepository.findById(request.getAquariumId())
+                .filter(a -> a.getUser().getUserId().equals(userDetails.getUser().getUserId()))
                 .orElseThrow(() -> new RuntimeException("어항이 없습니다"));
 
         FeedingSchedule schedule = FeedingSchedule.builder()
@@ -34,17 +36,18 @@ public class FeedingService {
     }
 
     // 수동 급여 실행
-    public boolean feedNow(Long aquariumId) {
+    public boolean feedNow(String userId, Long aquariumId) {
         boolean canFeed = feedingStateService.isAutoFeedingEnabled(aquariumId);
         if (!canFeed) return false;
 
-        mqttService.publish("aquatrack/" + aquariumId + "/feeding", "feed_now");
+        mqttService.publishToDevice(userId, aquariumId, "feeding", "feed_now");
         return true;
     }
 
-    public List<FeedingSchedule> getSchedules(Long aquariumId) {
+    public List<FeedingSchedule> getSchedules(Long aquariumId, CustomUserDetails userDetails) {
         Aquarium aquarium = aquariumRepository.findById(aquariumId)
-                .orElseThrow(() -> new RuntimeException("어항이 없습니다"));
+                .filter(a -> a.getUser().getUserId().equals(userDetails.getUser().getUserId()))
+                .orElseThrow(() -> new RuntimeException("해당 어항은 현재 사용자 소유가 아닙니다."));
         return scheduleRepository.findByAquariumAndEnabledTrue(aquarium);
     }
 }

@@ -26,22 +26,32 @@ public class MqttSensorSubscriber {
     @PostConstruct
     public void subscribeToSensorData() {
         try {
-            mqttClient.subscribe("aquatrack/+/sensor", (topic, message) -> {
+            mqttClient.subscribe("aquatrack/+/+/sensor", (topic, message) -> {
                 String payload = new String(message.getPayload());
                 log.info("📡 센서 MQTT 수신됨: topic={}, payload={}", topic, payload);
 
                 try {
-                    // 1. JSON 파싱 → DTO
-                    WaterQualityLogRequest request = objectMapper.readValue(payload, WaterQualityLogRequest.class);
+                    // 1. topic에서 userId, aquariumId 추출
+                    String[] parts = topic.split("/"); // [aquatrack, userId, aquariumId, sensor]
+                    String userId = parts[1];
+                    Long aquariumId = Long.parseLong(parts[2]);
 
-                    // 2. 저장 및 WebSocket 푸시
-                    WaterQualityLog savedLog = logService.save(request); // 저장
-                    sensorSocketSender.send(savedLog); // ✅ WebSocket 실시간 전송
+                    // 2. JSON → DTO 변환
+                    WaterQualityLogRequest request = objectMapper.readValue(payload, WaterQualityLogRequest.class);
+                    request.setAquariumId(aquariumId);
+                    request.setUserId(userId); // DTO에 해당 필드가 있을 경우
+
+                    // 3. 저장 + WebSocket 전송
+                    WaterQualityLog savedLog = logService.save(request);
+                    sensorSocketSender.send(savedLog);
 
                 } catch (Exception e) {
-                    log.error("❌ 센서 메시지 파싱 실패: {}", e.getMessage());
+                    log.error("❌ 센서 메시지 처리 실패: {}", e.getMessage());
                 }
             });
+
+            log.info("✅ MQTT 센서 토픽 구독 성공");
+
         } catch (MqttException e) {
             log.error("❌ 센서 토픽 구독 실패: {}", e.getMessage());
         }

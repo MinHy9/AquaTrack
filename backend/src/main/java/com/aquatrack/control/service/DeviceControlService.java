@@ -9,13 +9,11 @@ import org.springframework.stereotype.Service;
 public class DeviceControlService {
     private final MqttService mqttService;
 
-    public void controlWaterPump(Long aquariumId, boolean activate) {
-        String topic = "aquatrack/" + aquariumId + "/pump";
-        mqttService.publish(topic, activate ? "on" : "off");
+    public void controlWaterPump(String userId, Long aquariumId, boolean activate) {
+        mqttService.publishToDevice(userId, aquariumId, "pump", activate ? "on" : "off");
     }
 
-    public void controlCoolingFan(Long aquariumId, boolean activate) {
-        String topic = "aquatrack/" + aquariumId + "/cooler";
-        mqttService.publish(topic, activate ? "on" : "off");
+    public void controlCoolingFan(String userId, Long aquariumId, boolean activate) {
+        mqttService.publishToDevice(userId, aquariumId, "cooler", activate ? "on" : "off");
     }
 }
