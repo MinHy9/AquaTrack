@@ -2,7 +2,7 @@ import apiClient from "./apiClient";
 document.getElementById('register-btn').addEventListener('click', async() => {
     const name  = document.getElementById('aq-name').value.trim();
     const selectedFish = document.getElementById("fish_type").value;
-    if (!name || !owner) {
+    if (!name || !selectedFish) {
       alert('모든 필드를 입력해주세요.');
       return;
     }
