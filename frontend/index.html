@@ -11,7 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :where([class^="ri-"])::before { content: "\f3c2"; }
         body {
@@ -42,7 +44,7 @@
 <header class="bg-white shadow-sm py-4 px-6">
     <div class="container mx-auto flex justify-between items-center">
         <a href="#" class="text-primary text-2xl font-['Pacifico'] font-bold">Aqua Track</a>
-        <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-4" id="nav-links">
             <a href="login.html" class="text-primary hover:text-primary/80 transition-colors">Login</a>
             <a href="register.html" class="text-primary hover:text-primary/80">어항 등록</a>
         </div>
@@ -53,7 +55,6 @@
     <h2 class="text-2xl font-bold mb-4">내 어항 목록</h2>
     <div id="list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <!-- 스크립트가 여기로 카드들을 채워 넣습니다 -->
-        
     </div>
 </main>
 <div class="container mx-auto py-6 px-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -63,12 +64,6 @@
         <div class="bg-white rounded shadow-sm p-6">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold text-gray-800">실시간 모니터링</h2>
-                <div class="flex items-center text-sm text-gray-500">
-                    현재 시간 &nbsp; <span id="current-time"></span> 기준
-                    <button id="time-refresh-button" class="ml-2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-primary">
-                        <i class="ri-refresh-line"></i>
-                    </button>
-                </div>
             </div>
             <!-- 데이터 카드 그리드 -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -81,7 +76,7 @@
                         <span>수온</span>
                     </div>
                     <div class="flex items-end">
-                        <span class="value text-3xl font-bold text-blue-700"></span>
+                        <span class="value text-3xl font-bold text-blue-700">24.5</span>
                         <span class="ml-1 text-gray-600">°C</span>
                     </div>
                 </div>
@@ -94,7 +89,7 @@
                         <span>pH</span>
                     </div>
                     <div class="flex items-end">
-                        <span class="value text-3xl font-bold text-green-700"></span>
+                        <span class="value text-3xl font-bold text-green-700">7.2</span>
                     </div>
                 </div>
                 <!-- 탁도 카드 -->
@@ -106,15 +101,15 @@
                         <span>탁도</span>
                     </div>
                     <div class="flex items-end">
-                        <span class="value text-3xl font-bold text-purple-700"></span>
+                        <span class="value text-3xl font-bold text-purple-700">2.8</span>
                         <span class="ml-1 text-gray-600">NTU</span>
                     </div>
                 </div>
             </div>
             <!-- 새로고침 버튼 -->
-            <button id="date-refresh-button" class="refresh-button ml-2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-primary">
+            <button class="refresh-button ml-2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-primary">
                 <i class="ri-refresh-line"></i>
-            </button><span id="today-date"></span>
+            </button>
             <!-- 그래프 영역 -->
             <div class="mt-4">
                 <div class="flex justify-between items-center mb-4">
@@ -138,6 +133,7 @@
         </div>
         <!-- 데이터 분석 카드 -->
         <div class="bg-white rounded shadow-sm p-6">
+            <canvas id="stats-chart" class="w-full h-64 mt-4"></canvas>
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold text-gray-800">데이터 분석</h2>
                 <div class="flex space-x-2">
@@ -160,11 +156,10 @@
             </div>
             <!-- 날짜 선택 -->
             <div class="flex justify-between items-center mb-4">
-                <button id="left_button" class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary">
+                <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary">
                     <i class="ri-arrow-left-s-line"></i>
                 </button>
-                <span id="time"></span>
-                <button id="right_button" class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary">
+                <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary">
                     <i class="ri-arrow-right-s-line"></i>
                 </button>
             </div>
@@ -180,41 +175,43 @@
             <div class="space-y-4">
                 <div class="flex justify-between items-center">
                     <div class="text-gray-700">마지막 급식</div>
-                    <div id="last_feeding" class="text-gray-900 font-medium"></div>
+                    <div class="text-gray-900 font-medium">오늘 08:00</div>
                 </div>
                 <div class="flex justify-between items-center">
-                    <div id="next_feeding" class="text-gray-700">다음 급식</div>
-                    <div class="text-gray-900 font-medium"></div>
+                    <div class="text-gray-700">다음 급식</div>
+                    <div class="text-gray-900 font-medium">오늘 20:00</div>
                 </div>
-                <button class="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-button mt-4 whitespace-nowrap">
+                <button id="feeder-btn" class="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-button mt-4 whitespace-nowrap">
                     수동 급식
                 </button>
                 <!-- 냉각팬 작동/끄기 -->
                 <div class="flex space-x-2 mt-2">
-                    <button id="cooling_pan_on" class="w-1/2 bg-primary hover:bg-primary/90 text-white py-3 rounded-button whitespace-nowrap">
+                    <button id="cooler-on-btn" class="w-1/2 bg-primary hover:bg-primary/90 text-white py-3 rounded-button whitespace-nowrap">
                         냉각팬 작동
                     </button>
-                    <button id="cooling_pan_off" class="w-1/2 bg-red-500 hover:bg-red-600 text-white py-3 rounded-button whitespace-nowrap">
+                    <button id="cooler-off-btn" class="w-1/2 bg-red-500 hover:bg-red-600 text-white py-3 rounded-button whitespace-nowrap">
                         냉각팬 끄기
                     </button>
                 </div>
                 <!-- 환수팬 작동/끄기 -->
                 <div class="flex space-x-2 mt-2">
-                    <button id="water_pan_on"class="w-1/2 bg-primary hover:bg-primary/90 text-white py-3 rounded-button whitespace-nowrap">
-                        환수팬 작동
+                    <button id="pump-on-btn" class="w-1/2 bg-primary hover:bg-primary/90 text-white py-3 rounded-button whitespace-nowrap">
+                        환수모터 작동
                     </button>
-                    <button id="water_pan_off" class="w-1/2 bg-red-500 hover:bg-red-600 text-white py-3 rounded-button whitespace-nowrap">
-                        환수팬 끄기
+                    <button id="pump-off-btn" class="w-1/2 bg-red-500 hover:bg-red-600 text-white py-3 rounded-button whitespace-nowrap">
+                        환수모터 끄기
                     </button>
+                </div>
             </div>
         </div>
         <!-- 환경 설정 카드 -->
         <div class="bg-white rounded shadow p-6 relative">
             <h2 class="text-xl font-bold text-gray-800 mb-6">환경 설정</h2>
+            <!-- 어항 ID 입력 + 조회 버튼 -->
             <div class="space-y-4">
                 <div>
                     <label class="block text-gray-700 mb-2">어종 선택</label>
-                    <select id="fish_type" class="w-full bg-gray-100 border-none rounded p-3">
+                    <select id="fish-select" class="w-full bg-gray-100 border-none rounded p-3">
                         <option>구피</option>
                         <option>금붕어</option>
                         <option>디스커스</option>
@@ -222,7 +219,7 @@
                     </select>
                 </div>
                 <button id="save-config-btn"
-                        class="absolute top-6 right-6 px-3 py-1 bg-primary text-white rounded hover:bg-primary/90 text-sm">
+                        class="absolute top-0 right-0 mt-6 mr-6 px-3 py-1 bg-primary text-white rounded hover:bg-primary/90 text-sm">
                     설정 저장
                 </button>
                 <div>
@@ -244,15 +241,21 @@
                 <div>
                     <label class="block text-gray-700 mb-2">급식 주기</label>
                     <select id="feed-select" class="w-full bg-gray-100 border-none rounded p-3">
-                        <option>하루 2회 (08:00, 20:00)</option>
-                        <option>하루 3회 (08:00, 14:00, 20:00)</option>
-                        <option>하루 1회 (12:00)</option>
-                        <option>맞춤 설정</option>
+                        <option value="08:00,20:00">하루 2회 (08:00, 20:00)</option>
+                        <option value="08:00,14:00,20:00">하루 3회 (08:00, 14:00, 20:00)</option>
+                        <option value="12:00">하루 1회 (12:00)</option>
+                        <option value="custom">맞춤 설정</option>
                     </select>
+                    <button id="save-feed-btn" class="bg-blue-500 text-white px-4 py-2 rounded">
+                        급식 시간 저장
+                    </button>
                     <div id="custom-times" class="mt-2 hidden">
-                        <label class="block text-sm text-gray-600 mt-2">맞춤 시간 입력 (쉼표로 구분)</label>
-                        <input type="text" placeholder="예: 07:30, 13:00, 19:45" class="w-full mt-1 p-2 border border-gray-200 rounded text-sm" />
+                        <label class="block text-sm text-gray-600">맞춤 시간 입력 (쉼표로 구분)</label>
+                        <input type="text" id="custom-feed-times" placeholder="예: 07:30, 13:00, 19:45" class="w-full mt-1 p-2 border border-gray-200 rounded text-sm" />
                     </div>
+                    <p class="text-sm text-gray-600 mt-2">
+                        현재 저장된 급식 시간: <span id="current-schedule">-</span>
+                    </p>
                 </div>
             </div>
         </div>
@@ -277,20 +280,474 @@
 
     </div>
 </div>
-<script src="date.js"></script>
-<script type="module" src="./api/waterLogApi.js"></script>
-<script type="module" src="./api/waterStatsApi.js"></script>
-<script type="module" src="./api/waterFigureApi.js"></script>
-<script type="module" src="./api/FeedingSchedule.js"></script>
-<script type="module" src="./api/deviceControllApi.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-    const multiChart = echarts.init(document.getElementById('multiChart'));
-    const singleChart = echarts.init(document.getElementById('singleChart'));
-// 창 크기 변경 시 차트 크기 조정
-        window.addEventListener('resize', function() {
-            multiChart.resize();
+    async function updateFishSelect() {
+        const aquariumId = localStorage.getItem('selectedAquariumId');
+        if (!aquariumId) return;
+
+        try {
+            const res = await fetch(`/api/aquariums/${aquariumId}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            if (!res.ok) throw new Error('어항 정보를 불러오지 못했습니다');
+
+            const data = await res.json();
+            document.getElementById('fish-select').value = data.fishType;
+        } catch (err) {
+            console.error(err);
+        }
+    }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // 차트 초기화
+        const singleChart = echarts.init(document.getElementById('singleChart'));
+        const multiChart = echarts.init(document.getElementById('multiChart'));
+
+        // 다중 차트 기본 옵션
+        multiChart.setOption({
+            animation: false,
+            grid: { left: '3%', right: '3%', bottom: '3%', top: '3%', containLabel: true },
+            xAxis: { type: 'category', data: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'] },
+            yAxis: { type: 'value' },
+            tooltip: { trigger: 'axis' },
+            series: [
+                { name: '수온', type: 'line', data: [23.5, 23.2, 23.8, 24.5, 24.2, 24.0], smooth: true },
+                { name: 'pH', type: 'line', data: [7.1, 7.2, 7.2, 7.3, 7.2, 7.2], smooth: true },
+                { name: '탁도', type: 'line', data: [3.1, 3.0, 2.8, 2.7, 2.8, 2.9], smooth: true }
+            ]
+        });
+
+        let selectedMetric = 'temp';
+        let selectedRange = 'daily';
+        const colorMap = {
+            temperature: '#4169E1',
+            ph: 'rgba(141,211,199,1)',
+            turbidity: 'rgba(252,141,98,1)'
+        };
+
+        function updateSingleChart() {
+            const key = { temp: 'temperature', ph: 'ph', turbidity: 'turbidity' }[selectedMetric];
+            fetch(`/api/chart/${selectedRange}`)
+                .then(res => res.json())
+                .then(data => {
+                    singleChart.setOption({
+                        xAxis: { type: 'category', data: data.categories },
+                        yAxis: { type: 'value' },
+                        series: [{
+                            name: key,
+                            type: 'line',
+                            data: data[key],
+                            smooth: true,
+                            lineStyle: { width: 3, color: colorMap[key] },
+                            areaStyle: {
+                                color: {
+                                    type: 'linear',
+                                    x: 0, y: 0, x2: 0, y2: 1,
+                                    colorStops: [
+                                        { offset: 0, color: colorMap[key].replace(/1\)$/, '0.2)') },
+                                        { offset: 1, color: colorMap[key].replace(/1\)$/, '0.05)') }
+                                    ]
+                                }
+                            }
+                        }]
+                    });
+                });
+        }
+
+
+        // 버튼 바인딩
+        document.querySelectorAll('.metric-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.metric-btn').forEach(b => b.classList.remove('bg-blue-100', 'text-blue-700'));
+                btn.classList.add('bg-blue-100', 'text-blue-700');
+                selectedMetric = btn.dataset.metric;
+                updateSingleChart();
+            });
+        });
+
+        document.querySelectorAll('.range-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('bg-gray-100', 'hover:bg-gray-200'));
+                btn.classList.add('bg-gray-100', 'hover:bg-gray-200');
+                selectedRange = btn.dataset.range;
+                updateSingleChart();
+            });
+        });
+
+        // 초기 렌더링
+        updateSingleChart();
+
+        let chartInstance = null;
+        let currentMetric = 'temperature';
+        let currentPeriod = 'daily';
+
+        function fetchStats() {
+            const aquariumId = localStorage.getItem('selectedAquariumId');
+            if (!aquariumId) return;
+
+            fetch(`/api/stats/${currentPeriod}?aquariumId=${aquariumId}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const labels = data.map(d => d.date || d.day || d.month);
+                    const values = data.map(d => {
+                        if (currentMetric === 'temperature') return d.temperatureAvg;
+                        if (currentMetric === 'ph') return d.phAvg;
+                        if (currentMetric === 'turbidity') return d.turbidityAvg;
+                    });
+
+                    drawChart(labels, values, currentMetric + ' 평균');
+                });
+        }
+
+        function drawChart(labels, values, label) {
+            const ctx = document.getElementById('stats-chart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            let color = '#4169E1';
+            let bg = 'rgba(65,105,225,0.2)';
+
+            if (currentMetric === 'ph') {
+                color = '#3CB371';
+                bg = 'rgba(60,179,113,0.2)';
+            } else if (currentMetric === 'turbidity') {
+                color = '#FFA500';
+                bg = 'rgba(255,165,0,0.2)';
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label,
+                        data: values,
+                        borderWidth: 2,
+                        borderColor: color,
+                        backgroundColor: bg,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 버튼 연결
+            document.querySelectorAll('[data-metric]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentMetric = btn.dataset.metric;
+                    fetchStats();
+                });
+            });
+
+            document.querySelectorAll('[data-period]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentPeriod = btn.dataset.period;
+                    fetchStats();
+                });
+            });
+
+            fetchStats(); // 첫 로딩 시 자동 호출
+        });
+
+        // 리사이즈 처리
+        window.addEventListener('resize', () => {
             singleChart.resize();
+            multiChart.resize();
+        });
+
+        function controlDevice(device, command) {
+            const aquariumId = localStorage.getItem('selectedAquariumId');
+            if (!aquariumId) {
+                alert("먼저 어항을 선택해주세요.");
+                return;
+            }
+
+            fetch('/api/control/device', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({ aquariumId, device, command })
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error('제어 실패');
+                    alert(`${device} ${command} 명령 전송 완료`);
+                })
+                .catch(err => alert(err.message));
+        }
+
+        // 제어 버튼 이벤트 바인딩
+        document.getElementById('feeder-btn')?.addEventListener('click', () => controlDevice('feeder', 'on'));
+        document.getElementById('cooler-on-btn')?.addEventListener('click', () => controlDevice('cooler', 'on'));
+        document.getElementById('cooler-off-btn')?.addEventListener('click', () => controlDevice('cooler', 'off'));
+        document.getElementById('pump-on-btn')?.addEventListener('click', () => controlDevice('pump', 'on'));
+        document.getElementById('pump-off-btn')?.addEventListener('click', () => controlDevice('pump', 'off'));
+
+        // 어항 목록 로딩
+        (async function loadList() {
+            try {
+                const res = await fetch('/api/aquarium/list');
+                const list = await res.json();
+                const container = document.getElementById('list-container');
+                if (list.length === 0) {
+                    container.innerHTML = '<p class="text-gray-600">등록된 어항이 없습니다.</p>';
+                    return;
+                }
+                container.innerHTML = list.map(aq => `
+              <div class="p-4 border rounded hover:shadow aquarium-card" data-id="${aq.id}">
+                <h3 class="text-lg font-semibold">${aq.name}</h3>
+                <p class="text-gray-700">소유자: ${aq.owner}</p>
+                <p class="text-sm text-gray-500">ID: ${aq.id}</p>
+              </div>
+            `).join('');
+            } catch (e) {
+                document.getElementById('list-container').innerHTML =
+                    `<p class="text-red-500">목록 불러오기 실패: ${e.message}</p>`;
+            }
+        })();
+        // 카드 클릭 시 선택된 어항 ID 저장
+        document.addEventListener('click', e => {
+            const card = e.target.closest('.aquarium-card');
+            if (!card) return;
+
+            const id = card.dataset.id;
+            localStorage.setItem('selectedAquariumId', id);
+            console.log(`어항 ${id} 선택됨`);
+
+            // 시각적 강조 (선택된 카드)
+            document.querySelectorAll('.aquarium-card').forEach(c => c.classList.remove('ring-2', 'ring-blue-500'));
+            card.classList.add('ring-2', 'ring-blue-500');
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const socket = new SockJS('/ws');
+        const stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, () => {
+            stompClient.subscribe('/topic/sensor', (message) => {
+                const data = JSON.parse(message.body);
+                updateSensorCards(data);
+            });
+        });
+
+        function updateSensorCards(data) {
+            document.querySelector('.temp-card .value').textContent = data.temperature.toFixed(1);
+            document.querySelector('.ph-card .value').textContent = data.ph.toFixed(1);
+            document.querySelector('.turb-card .value').textContent = data.turbidity.toFixed(1);
+
+            const statusCard = document.getElementById('status-card');
+            const statusText = document.getElementById('status-text');
+            const statusDesc = document.getElementById('status-desc');
+            const alertText = document.getElementById('danger-alert');
+            const statusBadge = document.getElementById('status-badge');
+
+            if (data.status === 'danger') {
+                statusCard.classList.remove('status-normal');
+                statusCard.classList.add('status-danger');
+                statusText.textContent = '위험 상태';
+                statusBadge.textContent = '위험';
+                statusBadge.classList.remove('bg-green-100', 'text-green-800');
+                statusBadge.classList.add('bg-red-100', 'text-red-800');
+                statusDesc.textContent = '하나 이상의 수질 지표가 위험 범위에 있습니다.';
+                alertText.classList.remove('hidden');
+            } else {
+                statusCard.classList.remove('status-danger');
+                statusCard.classList.add('status-normal');
+                statusText.textContent = '정상 상태';
+                statusBadge.textContent = '정상';
+                statusBadge.classList.remove('bg-red-100', 'text-red-800');
+                statusBadge.classList.add('bg-green-100', 'text-green-800');
+                statusDesc.textContent = '모든 수질 지표가 정상 범위 내에 있습니다.';
+                alertText.classList.add('hidden');
+            }
+        }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        function fetchCurrentSchedules() {
+            const aquariumId = localStorage.getItem('selectedAquariumId');
+            if (!aquariumId) return;
+
+            fetch(`/api/feeding/schedule/${aquariumId}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error("스케줄 조회 실패");
+                    return res.json();
+                })
+                .then(data => {
+                    const times = data.map(item => item.time).join(', ');
+                    document.getElementById('current-schedule').textContent = times || '없음';
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('current-schedule').textContent = '조회 실패';
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateFishSelect(); // 자동 어종 표시
+
+            const selectEl = document.getElementById('feed-select');
+            const customWrapper = document.getElementById('custom-times');
+            const customInput = document.getElementById('custom-feed-times');
+
+            selectEl.addEventListener('change', () => {
+                customWrapper.classList.toggle('hidden', selectEl.value !== 'custom');
+            });
+
+            fetchCurrentSchedules();
+
+            document.getElementById('save-feed-btn')?.addEventListener('click', () => {
+                const aquariumId = localStorage.getItem('selectedAquariumId');
+                if (!aquariumId) {
+                    alert("어항을 선택해주세요.");
+                    return;
+                }
+
+                let feedingTimes = [];
+                const selected = selectEl.value;
+
+                if (selected === 'custom') {
+                    const rawInput = customInput.value;
+                    feedingTimes = rawInput
+                        .split(',')
+                        .map(t => t.trim())
+                        .filter(t => {
+                            const [h, m] = t.split(':').map(Number);
+                            return /^\d{2}:\d{2}$/.test(t) && h >= 0 && h < 24 && m >= 0 && m < 60;
+                        });
+
+                    if (feedingTimes.length === 0) {
+                        alert("올바른 시간 형식을 쉼표로 구분해서 입력해주세요.");
+                        return;
+                    }
+
+                    fetch('/api/feeding/schedules', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({ aquariumId, feedingTimes })
+                    })
+                        .then(res => {
+                            if (!res.ok) throw new Error("저장 실패");
+                            alert("맞춤 급식 시간이 저장되었습니다!");
+                            fetchCurrentSchedules();
+                        })
+                        .catch(err => alert("오류: " + err.message));
+                } else {
+                    fetch('/api/feeding/schedule', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({ aquariumId, feedingTime: selected })
+                    })
+                        .then(res => {
+                            if (!res.ok) throw new Error("저장 실패");
+                            alert("기본 급식 시간이 저장되었습니다!");
+                            fetchCurrentSchedules();
+                        })
+                        .catch(err => alert("오류: " + err.message));
+                }
+            });
+        });
+
+        // 설정 저장 버튼 클릭
+        document.getElementById('save-config-btn')?.addEventListener('click', () => {
+            const aquariumId = localStorage.getItem('selectedAquariumId');
+            if (!aquariumId) {
+                alert('어항을 먼저 선택해주세요.');
+                return;
+            }
+
+            const config = {
+                aquariumId,
+                fishType: document.getElementById('fish-select').value,
+                tempMin: parseFloat(document.getElementById('cfg-temp-min').value),
+                tempMax: parseFloat(document.getElementById('cfg-temp-max').value),
+                phMin: parseFloat(document.getElementById('cfg-ph-min').value),
+                phMax: parseFloat(document.getElementById('cfg-ph-max').value),
+                turbMax: parseFloat(document.getElementById('cfg-turb-max').value)
+            };
+
+            fetch('/api/aquariums/threshold', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(config)
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error('서버 오류');
+                    alert('설정이 저장되었습니다!');
+                })
+                .catch(err => {
+                    alert('설정 저장 실패: ' + err.message);
+                });
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const nav = document.getElementById('nav-links');
+        const isLoggedIn = localStorage.getItem('loggedIn') === 'true'; // 예시
+
+        if (isLoggedIn) {
+            nav.innerHTML = `
+        <a href="index.html" class="text-primary hover:text-primary/80">대시보드</a>
+        <a href="register.html" class="text-primary hover:text-primary/80">어항 등록</a>
+        <a href="#" class="text-primary hover:text-primary/80" onclick="logout()">로그아웃</a>
+      `;
+        } else {
+            nav.innerHTML = `
+        <a href="login.html" class="text-primary hover:text-primary/80">로그인</a>
+      `;
+        }
+    });
+
+    function logout() {
+        localStorage.removeItem('loggedIn');
+        location.href = 'login.html';
+    }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const selectEl = document.getElementById('feed-select');
+        const customWrapper = document.getElementById('custom-times');
+
+        selectEl.addEventListener('change', () => {
+            if (selectEl.value === 'custom') {
+                customWrapper.classList.remove('hidden');
+            } else {
+                customWrapper.classList.add('hidden');
+            }
         });
     });
 </script>

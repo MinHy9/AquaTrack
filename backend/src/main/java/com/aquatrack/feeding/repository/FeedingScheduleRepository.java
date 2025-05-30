@@ -11,4 +11,8 @@ public interface FeedingScheduleRepository extends JpaRepository<FeedingSchedule
     List<FeedingSchedule> findByAquariumAndEnabledTrue(Aquarium aquarium);
 
     List<FeedingSchedule> findByTime(String time); // 시간 일치하는 스케줄 조회
+
+    boolean existsByAquariumAndTime(Aquarium aquarium, String time);
+
+    void deleteByAquarium(Aquarium aquarium);
 }

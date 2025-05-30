@@ -34,6 +34,26 @@ public class FeedingService {
 
         return scheduleRepository.save(schedule);
     }
+    //사용자지정 급여시간 등록
+    public void registerMultipleSchedules(Long aquariumId, List<String> times, CustomUserDetails userDetails) {
+        Aquarium aquarium = aquariumRepository.findById(aquariumId)
+                .filter(a -> a.getUser().getUserId().equals(userDetails.getUser().getUserId()))
+                .orElseThrow(() -> new RuntimeException("어항이 없습니다"));
+
+        scheduleRepository.deleteByAquarium(aquarium);
+
+        for (String time : times) {
+            boolean exists = scheduleRepository.existsByAquariumAndTime(aquarium, time);
+            if (exists) continue; // 이미 있으면 저장 안함
+
+            FeedingSchedule schedule = FeedingSchedule.builder()
+                    .aquarium(aquarium)
+                    .time(time)
+                    .enabled(true)
+                    .build();
+            scheduleRepository.save(schedule);
+        }
+    }
 
     // 수동 급여 실행
     public boolean feedNow(String userId, Long aquariumId) {

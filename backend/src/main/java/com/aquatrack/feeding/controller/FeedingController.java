@@ -25,6 +25,14 @@ public class FeedingController {
             @RequestBody FeedingScheduleRequest request) {
         return ResponseEntity.ok(feedingService.registerSchedule(request, userDetails));
     }
+    // 사용자 지정 급여시간 설정
+    @PostMapping("/schedules")
+    public ResponseEntity<?> registerMultipleSchedules(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody FeedingScheduleRequest request) {
+        feedingService.registerMultipleSchedules(request.getAquariumId(), request.getFeedingTimes(), userDetails);
+        return ResponseEntity.ok("다중 급식 시간이 저장되었습니다.");
+    }
 
     // 수동 급여 (즉시 먹이 주기)
     @PostMapping("/manual/{aquariumId}")

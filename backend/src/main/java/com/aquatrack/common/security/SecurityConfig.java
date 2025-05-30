@@ -45,13 +45,13 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    //CORS처리
+    //CORS 처리
     @Configuration
     public class WebConfig implements WebMvcConfigurer {
 
         @Override
         public void addCorsMappings(CorsRegistry registry) {
-            registry.addMapping("/api/**")//API경로에서만 허용
+            registry.addMapping("/api/**")//API 허용
                     .allowedOrigins("http://localhost:5500") // 프론트가 동작하는 도메인 포트
                     .allowedMethods("*")
                     .allowedHeaders("*")

@@ -75,6 +75,10 @@
     <div class="mb-6 flex items-center">
       <input type="checkbox" id="agree-terms" class="mr-2" />
       <label for="agree-terms" class="text-sm text-gray-700">이용약관에 동의합니다.</label>
+      <button type="button" id="view-terms"
+              class="ml-3 text-sm text-blue-500 hover:underline">
+        [약관 보기]
+      </button>
     </div>
 
     <!-- 회원가입 버튼 -->
@@ -82,9 +86,119 @@
     <div class="text-center text-sm text-gray-600 mt-4">
       <span>이미 계정이 있으신가요?</span>
       <a href="login.html" class="text-primary hover:underline ml-1">로그인</a>
+    </div>
   </div>
-</div>
-<script src="./api/registerApi.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-</body>
+
+  <!-- 이용약관 모달 -->
+  <div id="terms-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded shadow-lg w-full max-w-md p-6 relative">
+      <h3 class="text-lg font-bold mb-4">이용약관</h3>
+      <div class="text-sm text-gray-700 h-64 overflow-y-auto border p-4 rounded bg-gray-50">
+        <p class="mb-2">본 서비스는 사용자의 어항 환경을 원격으로 모니터링 및 제어하기 위한 시스템입니다.</p>
+        <p class="mb-2">수집되는 정보는 어항의 센서 데이터, 사용자 입력 데이터 등이 포함됩니다.</p>
+        <p class="mb-2">이용자는 본 시스템의 정보를 상업적 용도로 무단 사용하거나 배포할 수 없습니다.</p>
+        <p class="mb-2">당사는 서비스 개선을 위해 사용자 데이터를 분석할 수 있으며, 이는 철저히 비식별화하여 처리됩니다.</p>
+      </div>
+      <button id="close-terms" class="absolute top-2 right-2 text-gray-400 hover:text-gray-600">
+        ✕
+      </button>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 약관 보기 모달 기능
+      document.getElementById('view-terms').addEventListener('click', () => {
+        document.getElementById('terms-modal').classList.remove('hidden');
+      });
+
+      document.getElementById('close-terms').addEventListener('click', () => {
+        document.getElementById('terms-modal').classList.add('hidden');
+      });
+
+      document.getElementById('signup-button').onclick = () => {
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const confirmPassword = document.getElementById('confirm-password').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const agree = document.getElementById('agree-terms').checked;
+
+        // 유효성 초기화
+        document.querySelectorAll('.error-message').forEach(e => e.style.display = 'none');
+
+        let valid = true;
+
+        if (!email.value.endsWith('@gmail.com')) {
+          document.getElementById('email-error').style.display = 'block';
+          valid = false;
+        }
+
+        if (email.value === password.value) {
+          document.getElementById('password-same-error').style.display = 'block';
+          valid = false;
+        }
+
+        const hasLetter = /[a-zA-Z]/.test(password.value);
+        const hasNumber = /\d/.test(password.value);
+        const hasSpecial = /[!@#$%^&*]/.test(password.value);
+        if (!(hasLetter && hasNumber && hasSpecial)) {
+          document.getElementById('password-format-error').style.display = 'block';
+          valid = false;
+        }
+
+        if (/(.)\1{3,}/.test(password.value)) {
+          document.getElementById('password-repeat-error').style.display = 'block';
+          valid = false;
+        }
+
+        if (password.value !== confirmPassword.value) {
+          document.getElementById('confirm-password-error').style.display = 'block';
+          valid = false;
+        }
+
+        if (!phone.value.startsWith('010') || !/^\d{11}$/.test(phone.value)) {
+          document.getElementById('phone-error').style.display = 'block';
+          valid = false;
+        }
+
+        if (!name || !email || !password || !confirmPassword || !phone) {
+          alert('모든 필드를 입력해주세요.');
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          alert('비밀번호가 일치하지 않습니다.');
+          return;
+        }
+
+        if (!agree) {
+          alert('이용약관에 동의해주세요.');
+          valid = false;
+        }
+
+        if (valid) {
+          alert('회원가입이 완료되었습니다!');
+          window.location.href = 'login.html';
+        }
+        // API 연동
+        fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: name, email, password, phone })
+        })
+                .then(res => {
+                  if (!res.ok) throw new Error('회원가입 실패');
+                  return res.text(); // 문자열 응답이므로 .text()
+                })
+                .then(msg => {
+                  alert(msg || '회원가입 완료!');
+                  location.href = 'login.html';
+                })
+                .catch(err => {
+                  alert('에러: ' + err.message);
+                });
+      };
+    });
+  </script>
+ </body>
 </html>
