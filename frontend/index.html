@@ -46,7 +46,7 @@
         <a href="#" class="text-primary text-2xl font-['Pacifico'] font-bold">Aqua Track</a>
         <div class="flex items-center space-x-4" id="nav-links">
             <a href="login.html" class="text-primary hover:text-primary/80 transition-colors">Login</a>
-            <a href="register.html" class="text-primary hover:text-primary/80">어항 등록</a>
+            <a href="aquarium-register.html" class="text-primary hover:text-primary/80">어항 등록</a>
         </div>
     </div>
 </header>
@@ -210,7 +210,7 @@
             <!-- 어항 ID 입력 + 조회 버튼 -->
             <div class="space-y-4">
                 <div>
-                    <label class="block text-gray-700 mb-2">어종 선택</label>
+                    <label for="fish-select" class="block text-gray-700 mb-2">어종 선택</label>
                     <select id="fish-select" class="w-full bg-gray-100 border-none rounded p-3">
                         <option>구피</option>
                         <option>금붕어</option>
@@ -280,13 +280,16 @@
 
     </div>
 </div>
-<script>
+<!-- <script>
+    const API_BASE = location.origin.includes('localhost')
+        ? 'http://localhost:8080'
+        : location.origin;
     async function updateFishSelect() {
         const aquariumId = localStorage.getItem('selectedAquariumId');
         if (!aquariumId) return;
 
         try {
-            const res = await fetch(`/api/aquariums/${aquariumId}`, {
+            const res = await fetch(`${API_BASE}/api/aquariums/${aquariumId}`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
@@ -302,6 +305,9 @@
     }
 </script>
 <script>
+    const API_BASE = location.origin.includes('localhost')
+        ? 'http://localhost:8080'
+        : location.origin;
     document.addEventListener('DOMContentLoaded', () => {
 
         // 차트 초기화
@@ -332,7 +338,7 @@
 
         function updateSingleChart() {
             const key = { temp: 'temperature', ph: 'ph', turbidity: 'turbidity' }[selectedMetric];
-            fetch(`/api/chart/${selectedRange}`)
+            fetch(`${API_BASE}/api/chart/${selectedRange}`)
                 .then(res => res.json())
                 .then(data => {
                     singleChart.setOption({
@@ -390,7 +396,7 @@
             const aquariumId = localStorage.getItem('selectedAquariumId');
             if (!aquariumId) return;
 
-            fetch(`/api/stats/${currentPeriod}?aquariumId=${aquariumId}`, {
+            fetch(`${API_BASE}/api/stats/${currentPeriod}?aquariumId=${aquariumId}`, {
                 headers: {
                     'Authorization': 'Bearer ' + localStorage.getItem('token')
                 }
@@ -477,7 +483,7 @@
                 return;
             }
 
-            fetch('/api/control/device', {
+            fetch(`${API_BASE}/api/control/device`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -502,7 +508,7 @@
         // 어항 목록 로딩
         (async function loadList() {
             try {
-                const res = await fetch('/api/aquarium/list');
+                const res = await fetch(`${API_BASE}/api/aquarium/list`);
                 const list = await res.json();
                 const container = document.getElementById('list-container');
                 if (list.length === 0) {
@@ -538,6 +544,9 @@
 </script>
 
 <script>
+    const API_BASE = location.origin.includes('localhost')
+        ? 'http://localhost:8080'
+        : location.origin;
     document.addEventListener('DOMContentLoaded', () => {
         const socket = new SockJS('/ws');
         const stompClient = Stomp.over(socket);
@@ -583,12 +592,15 @@
     });
 </script>
 <script>
+    const API_BASE = location.origin.includes('localhost')
+        ? 'http://localhost:8080'
+        : location.origin;
     document.addEventListener('DOMContentLoaded', () => {
         function fetchCurrentSchedules() {
             const aquariumId = localStorage.getItem('selectedAquariumId');
             if (!aquariumId) return;
 
-            fetch(`/api/feeding/schedule/${aquariumId}`, {
+            fetch(`${API_BASE}/api/feeding/schedule/${aquariumId}`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
@@ -645,7 +657,7 @@
                         return;
                     }
 
-                    fetch('/api/feeding/schedules', {
+                    fetch(`${API_BASE}/api/feeding/schedules`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -660,7 +672,7 @@
                         })
                         .catch(err => alert("오류: " + err.message));
                 } else {
-                    fetch('/api/feeding/schedule', {
+                    fetch(`${API_BASE}/api/feeding/schedule`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -696,7 +708,7 @@
                 turbMax: parseFloat(document.getElementById('cfg-turb-max').value)
             };
 
-            fetch('/api/aquariums/threshold', {
+            fetch(`${API_BASE}/api/aquariums/threshold`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -715,6 +727,9 @@
     });
 </script>
 <script>
+    const API_BASE = location.origin.includes('localhost')
+        ? 'http://localhost:8080'
+        : location.origin;
     document.addEventListener('DOMContentLoaded', () => {
         const nav = document.getElementById('nav-links');
         const isLoggedIn = localStorage.getItem('loggedIn') === 'true'; // 예시
@@ -722,7 +737,7 @@
         if (isLoggedIn) {
             nav.innerHTML = `
         <a href="index.html" class="text-primary hover:text-primary/80">대시보드</a>
-        <a href="register.html" class="text-primary hover:text-primary/80">어항 등록</a>
+        <a href="aquarium-register.html" class="text-primary hover:text-primary/80">어항 등록</a>
         <a href="#" class="text-primary hover:text-primary/80" onclick="logout()">로그아웃</a>
       `;
         } else {
@@ -738,6 +753,9 @@
     }
 </script>
 <script>
+    const API_BASE = location.origin.includes('localhost')
+        ? 'http://localhost:8080'
+        : location.origin;
     document.addEventListener('DOMContentLoaded', () => {
         const selectEl = document.getElementById('feed-select');
         const customWrapper = document.getElementById('custom-times');
@@ -750,6 +768,7 @@
             }
         });
     });
-</script>
+</script> -->
+<script type="module" src="js/index.js"></script>
 </body>
 </html>

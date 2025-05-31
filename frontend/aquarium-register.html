@@ -9,9 +9,9 @@
 <body class="bg-gray-100 p-8">
 <div class="max-w-md mx-auto bg-white p-6 rounded shadow">
   <h2 class="text-xl font-bold mb-4">어항 등록</h2>
-  <label class="block mb-2">어항 이름</label>
+  <label for="aq-name" class="block mb-2">어항 이름</label>
   <input id="aq-name" type="text" class="w-full p-2 mb-4 border rounded" placeholder="어항 이름"/>
-  <label class="block mb-2">소유자</label>
+  <label for="aq-owner" class="block mb-2">소유자</label>
   <input id="aq-owner" type="text" class="w-full p-2 mb-4 border rounded" placeholder="소유자"/>
   <button
           id="register-btn"
@@ -24,7 +24,7 @@
   </div>
 </div>
 
-<script>
+<!--<script>
   document.getElementById('register-btn').addEventListener('click', () => {
     const name  = document.getElementById('aq-name').value.trim();
     const owner = document.getElementById('aq-owner').value.trim();
@@ -54,6 +54,7 @@
               alert('등록 실패: ' + err.message);
             });
   });
-</script>
+</script> -->
+<script type="module" src="js/aquarium-register.js"></script>
 </body>
 </html>
