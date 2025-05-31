@@ -21,11 +21,12 @@ public class GlobalExceptionHandler {
 
     // DTO 유효성 검사 실패 (JSR-303)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidationErrors(MethodArgumentNotValidException ex) {
-        String message = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
-        return ResponseEntity
-                .badRequest()
-                .body(Map.of("message", Objects.requireNonNullElse(message, "입력값이 유효하지 않습니다.")));
+    public ResponseEntity<?> handleValidationErrors(MethodArgumentNotValidException e) {
+        String errorMsg = e.getBindingResult()
+                .getAllErrors()
+                .get(0)
+                .getDefaultMessage();
+        return ResponseEntity.badRequest().body("입력값 오류: " + errorMsg);
     }
 
     // 그 외 모든 예외

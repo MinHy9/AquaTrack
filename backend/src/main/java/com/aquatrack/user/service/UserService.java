@@ -98,7 +98,7 @@ public class UserService {
     }
 
     private boolean isValidPasswordFormat(String password) {
-        return password != null && password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$");
+        return password != null && password.matches("^(?=.*[A-Za-z])(?=.*\\d).{8,}$");
     }
 
     private boolean hasRepeatedCharacters(String password) {

@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const confirmPassword = document.getElementById('confirm-password').value;
         const phone = document.getElementById('phone').value.trim();
         const agree = document.getElementById('agree-terms').checked;
+        const phoneRegex = /^01[016789]\d{7,8}$/;
+
+        console.log({ name, email, password, phone });
 
         // 오류 메시지 초기화
         document.querySelectorAll('.error-message').forEach(e => e.style.display = 'none');
@@ -25,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let valid = true;
 
         // 유효성 검사
-        if (!email.endsWith('@gmail.com')) {
+        if (!email.includes('@')) {
             document.getElementById('email-error').style.display = 'block';
             valid = false;
         }
@@ -53,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
             valid = false;
         }
 
-        if (!phone.startsWith('010') || !/^\d{11}$/.test(phone)) {
+        if (!phoneRegex.test(phone)) {
             document.getElementById('phone-error').style.display = 'block';
             valid = false;
         }

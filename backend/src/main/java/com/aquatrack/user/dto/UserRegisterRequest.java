@@ -23,6 +23,6 @@ public class UserRegisterRequest {
     @Size(min = 6)
     private String password;
 
-    @Pattern(regexp = "^01[016789]-?\\d{3,4}-?\\d{4}$", message = "올바른 전화번호 형식이어야 합니다.")
+    @Pattern(regexp = "^01[016789]\\d{7,8}$", message = "하이픈 없이 숫자만 입력하세요. 예: 01012345678")
     private String phone;
 }
