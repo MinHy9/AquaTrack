@@ -21,11 +21,18 @@ public class AuthController {
 
     private final UserService userService;
 
+    @GetMapping("/check-email")
+    public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+        boolean exists = userService.isEmailDuplicated(email);
+        return ResponseEntity.ok(exists);
+    }
+
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody @Valid UserRegisterRequest request){
         userService.register(request);
         return ResponseEntity.ok("회원가입 완료!!");
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody @Valid UserLoginRequest request) {

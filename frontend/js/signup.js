@@ -1,6 +1,28 @@
 import { API_BASE } from './config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    // ✅ [추가] 이메일 중복 확인 기능
+    const emailInput = document.getElementById('email');
+    emailInput.addEventListener('blur', () => {
+        const email = emailInput.value.trim();
+        const errorElem = document.getElementById('email-error');
+        if (!email.includes('@')) return;
+
+        fetch(`${API_BASE}/api/auth/check-email?email=${encodeURIComponent(email)}`)
+            .then(res => res.json())
+            .then(isUsed => {
+                if (isUsed) {
+                    errorElem.textContent = '이미 사용 중인 이메일입니다.';
+                    errorElem.style.display = 'block';
+                } else {
+                    errorElem.style.display = 'none';
+                }
+            })
+            .catch(err => {
+                console.error('이메일 중복 확인 오류:', err);
+            });
+    });
+
     // 약관 보기 모달 열기/닫기
     document.getElementById('view-terms').addEventListener('click', () => {
         document.getElementById('terms-modal').classList.remove('hidden');

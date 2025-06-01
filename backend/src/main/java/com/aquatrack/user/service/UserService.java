@@ -27,9 +27,9 @@ public class UserService {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
         }
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+        /*if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
-        }
+        }*/
 
         // 1. 비밀번호 형식 검사
         if (!isValidPasswordFormat(request.getPassword())) {
@@ -52,6 +52,10 @@ public class UserService {
                 .build();
 
         userRepository.save(newUser);
+    }
+    //이메일 중복검사 버튼
+    public boolean isEmailDuplicated(String email) {
+        return userRepository.findByEmail(email).isPresent();
     }
 
     //로그인 기능
