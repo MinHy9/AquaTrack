@@ -23,6 +23,8 @@ export function renderNavbar() {
             logoutBtn.addEventListener('click', () => {
                 localStorage.removeItem('loggedIn');
                 localStorage.removeItem('token');
+                sessionStorage.removeItem('loggedIn');
+                sessionStorage.removeItem('token');
                 alert('로그아웃 되었습니다.');
                 location.href = 'login.html';
             });
