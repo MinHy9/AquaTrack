@@ -27,11 +27,21 @@ async function updateFishSelect() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+    const isLoggedIn = localStorage.getItem('loggedIn') === 'true' ||
+        sessionStorage.getItem('loggedIn') === 'true';
+    const guestMessage = document.getElementById('guest-message');
+    const listContainer = document.getElementById('list-container');
+
 
     if (!isLoggedIn) {
         location.href = 'login.html';
+        guestMessage.classList.remove('hidden');
+        listContainer.classList.add('hidden');
         return;
+    }
+    else {
+        guestMessage.classList.add('hidden');
+        listContainer.classList.remove('hidden');
     }
     initCharts(); // 차트 초기화만 우선
     initDashboard(); // 실시간 센서 수치 표시용

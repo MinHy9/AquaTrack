@@ -3,6 +3,7 @@ import { API_BASE } from './config.js';
 const passwordToggle = document.querySelector('.password-toggle');
 const passwordInput = document.getElementById('password');
 const passwordToggleIcon = document.getElementById('password-toggle-icon');
+const loginError = document.getElementById('login-error');
 
 passwordToggle.addEventListener('click', function () {
     const isPassword = passwordInput.type === 'password';
@@ -15,9 +16,12 @@ const loginButton = document.getElementById('login-button');
 loginButton.addEventListener('click', function () {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
+    const rememberChecked = document.getElementById('remember').checked;
+
+    loginError.classList.add('hidden');
 
     if (!email || !password) {
-        alert('이메일과 비밀번호를 모두 입력해주세요.');
+        loginError.classList.remove('hidden');
         return;
     }
 
@@ -31,8 +35,6 @@ loginButton.addEventListener('click', function () {
             return res.json();
         })
         .then(data => {
-            const rememberChecked = document.getElementById('remember').checked;
-
             if (rememberChecked) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('loggedIn', 'true');
@@ -46,6 +48,7 @@ loginButton.addEventListener('click', function () {
         })
 
         .catch(err => {
-            alert(err.message);
+            loginError.textContent = err.message;
+            loginError.classList.remove('hidden');
         });
 });
