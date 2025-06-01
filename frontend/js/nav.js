@@ -6,8 +6,7 @@ export function renderNavbar() {
     if (nav) {
         if (isLoggedIn) {
             nav.innerHTML = `
-                <a href="index.html" class="text-primary hover:text-primary/80">대시보드</a>
-                <a href="register.html" class="text-primary hover:text-primary/80">어항 등록</a>
+                <a href="aquarium-register.html" class="text-primary hover:text-primary/80">어항 등록</a>
                 <a href="#" class="text-primary hover:text-primary/80" id="logout-btn">로그아웃</a>
             `;
         } else {
