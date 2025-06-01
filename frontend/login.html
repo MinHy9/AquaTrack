@@ -44,7 +44,7 @@
 <header class="bg-white shadow-sm py-4 px-6">
     <div class="container mx-auto flex justify-between items-center">
         <a href="index.html" class="text-primary text-2xl font-['Pacifico'] font-bold">Aqua Track</a>
-        <a href="login.html" class="text-primary hover:text-primary/80 transition-colors">Login</a>
+        <div id="nav-links" class="flex items-center space-x-4">
     </div>
 </header>
 
@@ -137,5 +137,9 @@
     });
 </script> -->
 <script type="module" src="js/login.js"></script>
+<script type="module">
+    import { renderNavbar } from './js/nav.js';
+    renderNavbar();
+</script>
 </body>
 </html>

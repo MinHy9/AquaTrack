@@ -98,5 +98,16 @@ document.addEventListener('DOMContentLoaded', () => {
         alert("로그아웃 되었습니다.");
         location.href = 'login.html';
     };
+
+    document.querySelectorAll('.metric-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.metric-btn').forEach(b => {
+                b.classList.remove('bg-blue-100', 'text-blue-700');
+                b.classList.add('bg-gray-100', 'text-gray-700');
+            });
+            btn.classList.remove('bg-gray-100', 'text-gray-700');
+            btn.classList.add('bg-blue-100', 'text-blue-700');
+        });
+    });
 });
 

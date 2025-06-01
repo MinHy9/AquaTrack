@@ -137,9 +137,9 @@
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold text-gray-800">데이터 분석</h2>
                 <div class="flex space-x-2">
-                    <button class="range-btn bg-gray-100 hover:bg-gray-200 rounded-button px-4 py-2 text-gray-700 whitespace-nowrap" data-range="daily">일간</button>
-                    <button class="range-btn bg-gray-100 hover:bg-gray-200 rounded-button px-4 py-2 text-gray-700 whitespace-nowrap" data-range="weekly">주간</button>
-                    <button class="range-btn bg-gray-100 hover:bg-gray-200 rounded-button px-4 py-2 text-gray-700 whitespace-nowrap" data-range="monthly">월간</button>
+                    <button class="metric-btn bg-gray-100 hover:bg-gray-200 rounded-button px-4 py-2 text-gray-700 whitespace-nowrap" data-range="daily">일간</button>
+                    <button class="metric-btn bg-gray-100 hover:bg-gray-200 rounded-button px-4 py-2 text-gray-700 whitespace-nowrap" data-range="weekly">주간</button>
+                    <button class="metric-btn bg-gray-100 hover:bg-gray-200 rounded-button px-4 py-2 text-gray-700 whitespace-nowrap" data-range="monthly">월간</button>
                 </div>
             </div>
             <!-- 지표 선택 탭 -->
@@ -770,5 +770,9 @@
     });
 </script> -->
 <script type="module" src="js/index.js"></script>
+<script type="module">
+    import { renderNavbar } from './js/nav.js';
+    renderNavbar();
+</script>
 </body>
 </html>
