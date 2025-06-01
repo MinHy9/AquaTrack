@@ -27,6 +27,12 @@ async function updateFishSelect() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+
+    if (!isLoggedIn) {
+        location.href = 'login.html';
+        return;
+    }
     initCharts(); // 차트 초기화만 우선
     initDashboard(); // 실시간 센서 수치 표시용
     bindControlButtons();//제버튼 클릭
@@ -74,7 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //로그인상태
     const nav = document.getElementById('nav-links');
-    const isLoggedIn = localStorage.getItem('loggedIn') === 'true'; // 예시
 
     if (isLoggedIn) {
         nav.innerHTML = `
@@ -87,9 +92,11 @@ document.addEventListener('DOMContentLoaded', () => {
         <a href="login.html" class="text-primary hover:text-primary/80">로그인</a>
       `;
     }
-    function logout() {
+    window.logout = function () {
         localStorage.removeItem('loggedIn');
+        localStorage.removeItem('token');
+        alert("로그아웃 되었습니다.");
         location.href = 'login.html';
-    }
+    };
 });
 

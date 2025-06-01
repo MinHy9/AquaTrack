@@ -15,7 +15,7 @@ document.getElementById('register-btn').addEventListener('click', () => {
             ...AUTH_HEADER,
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ name })
+        body: JSON.stringify({ name, owner })
     })
         .then(res => {
             if (!res.ok) throw new Error('어항 등록 실패');
