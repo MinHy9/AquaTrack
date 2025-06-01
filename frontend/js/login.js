@@ -31,11 +31,20 @@ loginButton.addEventListener('click', function () {
             return res.json();
         })
         .then(data => {
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('loggedIn', 'true');
+            const rememberChecked = document.getElementById('remember').checked;
+
+            if (rememberChecked) {
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('loggedIn', 'true');
+            } else {
+                sessionStorage.setItem('token', data.token);
+                sessionStorage.setItem('loggedIn', 'true');
+            }
+
             alert('로그인 성공');
             location.href = 'index.html';
         })
+
         .catch(err => {
             alert(err.message);
         });

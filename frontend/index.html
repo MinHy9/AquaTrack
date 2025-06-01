@@ -281,7 +281,11 @@
 </div>
 <script>
     // 로그인 안 된 경우 로그인 페이지로 리디렉션
-    if (localStorage.getItem('loggedIn') !== 'true') {
+    const isLoggedIn =
+        localStorage.getItem('loggedIn') === 'true' ||
+        sessionStorage.getItem('loggedIn') === 'true';
+
+    if (!isLoggedIn) {
         window.location.href = 'login.html';
     }
 </script>
