@@ -280,6 +280,12 @@
 
     </div>
 </div>
+<script>
+    // 로그인 안 된 경우 로그인 페이지로 리디렉션
+    if (localStorage.getItem('loggedIn') !== 'true') {
+        window.location.href = 'login.html';
+    }
+</script>
 <!-- <script>
     const API_BASE = location.origin.includes('localhost')
         ? 'http://localhost:8080'
