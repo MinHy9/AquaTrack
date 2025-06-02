@@ -3,24 +3,30 @@ import {initDashboard} from "./dashboard.js";
 import {bindControlButtons} from "./control.js";
 import {initFeedingSettings} from "./feeding.js";
 import {initThresholdSettings} from "./threshold.js";
-
+console.log("✅ index.js 로딩됨");
 const API_BASE = location.origin.includes("localhost") ? "http://localhost:8080" : location.origin;
 
 async function updateFishSelect() {
     const aquariumId = localStorage.getItem('selectedAquariumId');
     if (!aquariumId) return;
 
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!token) {
+        console.warn("🚫 토큰 없음 - updateFishSelect 중단");
+        return;
+    }
+
     try {
         const res = await fetch(`${API_BASE}/api/aquariums/${aquariumId}`, {
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${token}`
             }
         });
 
         if (!res.ok) throw new Error('어항 정보를 불러오지 못했습니다');
 
         const data = await res.json();
-        document.getElementById('fish-select').value = data.fishType;
+        document.getElementById('fish-select').value = data.fishName;
     } catch (err) {
         console.error(err);
     }
@@ -51,21 +57,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 어항 목록 로딩
     (async function loadList() {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        console.log("🐟 loadList 실행됨, token:", token); // ✅ 추가
         try {
-            const res = await fetch(`${API_BASE}/api/aquarium/list`);
+            const res = await fetch(`${API_BASE}/api/aquariums`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            console.log("📡 응답 상태코드:", res.status); // ✅ 추가
             const list = await res.json();
+            console.log("📦 어항 목록 데이터:", list); // ✅ 추가
             const container = document.getElementById('list-container');
             if (list.length === 0) {
                 container.innerHTML = '<p class="text-gray-600">등록된 어항이 없습니다.</p>';
                 return;
             }
             container.innerHTML = list.map(aq => `
-              <div class="p-4 border rounded hover:shadow aquarium-card" data-id="${aq.id}">
+              <div class="p-4 border rounded hover:shadow aquarium-card" data-id="${aq.aquariumId}">
                 <h3 class="text-lg font-semibold">${aq.name}</h3>
-                <p class="text-gray-700">소유자: ${aq.owner}</p>
-                <p class="text-sm text-gray-500">ID: ${aq.id}</p>
+                <p class="text-gray-700">어종: ${aq.fishName}</p>
+                <p class="text-sm text-gray-500">ID: ${aq.aquariumId}</p>
               </div>
             `).join('');
+            // ✅ 목록이 렌더링된 후에 첫 번째 어항을 선택 상태로 저장
+            const firstId = list[0].aquariumId;
+            localStorage.setItem('selectedAquariumId', firstId);
+            updateFishSelect(); // 이 시점에 호출해야 정상 작동
         } catch (e) {
             document.getElementById('list-container').innerHTML =
                 `<p class="text-red-500">목록 불러오기 실패: ${e.message}</p>`;
@@ -86,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     //자동어종표시
-    updateFishSelect(); // 자동 어종 표시
+    //updateFishSelect(); // 자동 어종 표시
 
     //로그인상태
     const nav = document.getElementById('nav-links');

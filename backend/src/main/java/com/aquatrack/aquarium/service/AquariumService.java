@@ -58,6 +58,11 @@ public class AquariumService {
         return aquariumRepository.findByUser(user);
     }
 
+    public Aquarium getAquariumById(Long id) {
+        return aquariumRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 어항을 찾을 수 없습니다: " + id));
+    }
+
     //id로 어항찾기
     public Long getAquariumIdByUser(Long userId) {
         return aquariumRepository.findByUser_UserId(userId)

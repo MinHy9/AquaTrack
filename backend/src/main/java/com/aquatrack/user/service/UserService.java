@@ -19,6 +19,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final JwtTokenProvider jwtTokenProvider;
 
 
     //회원가입 기능
@@ -68,7 +69,6 @@ public class UserService {
         }
 
         // 로그인 성공 → JWT 발급
-        JwtTokenProvider jwtTokenProvider = new JwtTokenProvider();
         return jwtTokenProvider.createToken(user.getEmail());
     }
 

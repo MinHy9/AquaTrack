@@ -3,7 +3,21 @@ import { API_BASE, AUTH_HEADER } from './config.js';
 let singleChart, multiChart;
 
 export function initCharts() {
-    const chartType = document.getElementById("stat-select").value;
+    const statSelect = document.getElementById("stat-select");
+    if (!statSelect) {
+        console.warn("⚠️ stat-select 요소 없음. initCharts 실행 중단");
+        return;
+    }
+
+    const singleChartEl = document.getElementById('singleChart');
+    const multiChartEl = document.getElementById('multiChart');
+
+    if (!singleChartEl || !multiChartEl) {
+        console.warn("⚠️ 차트 요소가 없습니다. initCharts 중단");
+        return;
+    }
+
+    const chartType = statSelect.value;
 
     fetch(`${API_BASE}/api/chart/${chartType}`, {
         headers: AUTH_HEADER
@@ -41,7 +55,12 @@ export function initCharts() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById("stat-select").addEventListener("change", initCharts);
+    const statSelect = document.getElementById("stat-select");
+    if (statSelect) {
+        statSelect.addEventListener("change", initCharts);
+    } else {
+        console.warn("⚠️ stat-select 요소가 없습니다. 차트 변경 이벤트 바인딩 생략");
+    }
 });
 
 window.addEventListener('resize', () => {

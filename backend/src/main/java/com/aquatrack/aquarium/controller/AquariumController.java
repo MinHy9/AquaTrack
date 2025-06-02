@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +23,9 @@ public class AquariumController {
     // 어항 등록
     @PostMapping
     public ResponseEntity<?> registerAquarium(@RequestBody @Valid AquariumRequest request) {
-        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = userDetails.getUsername();
+
         Aquarium aquarium = aquariumService.register(email, request);
         return ResponseEntity.ok(aquarium);
     }
@@ -30,11 +33,21 @@ public class AquariumController {
     // 내 어항 목록 조회
     @GetMapping
     public ResponseEntity<List<Aquarium>> getMyAquariums() {
-        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // 🔧 여기 수정
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = userDetails.getUsername();
+
         return ResponseEntity.ok(aquariumService.getMyAquariums(email));
     }
 
-    //온도,탁도,pH설정 기준값 설정
+    // 어항 ID로 단일 어항 정보 조회
+    @GetMapping("/{aquariumId}")
+    public ResponseEntity<Aquarium> getAquarium(@PathVariable Long aquariumId) {
+        Aquarium aquarium = aquariumService.getAquariumById(aquariumId);
+        return ResponseEntity.ok(aquarium);
+    }
+
+    // 온도, 탁도, pH 설정 기준값 설정
     @PutMapping("/{aquariumId}/thresholds")
     public ResponseEntity<String> updateThresholds(@PathVariable Long aquariumId,
                                                    @RequestBody AquariumThresholdUpdateRequest req) {
