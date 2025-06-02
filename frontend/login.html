@@ -4,30 +4,40 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Aqua Track - 로그인</title>
-    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#4169E1',
-                        secondary: '#3F58E4'
+                        primary: '#84c5f4',
+                        secondary: '#A0E7E5',
+                        accent: '#FFB6B9'
+                    },
+                    fontFamily: {
+                        cute: ['Jua', 'sans-serif']
                     },
                     borderRadius: {
-                        button: '8px'
+                        button: '1rem'
                     }
                 }
             }
         };
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet" />
     <style>
         body {
-            font-family: 'Pretendard', sans-serif;
-            background-color: #f5f7fa;
+            font-family: 'Jua', sans-serif;
+            background: url('https://cdn.pixabay.com/photo/2017/01/31/13/14/fish-2020595_1280.png') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(8px);
         }
 
         input:focus {
@@ -39,118 +49,79 @@
         }
     </style>
 </head>
+<body class="flex flex-col min-h-screen">
 
-<body class="min-h-screen">
-<header class="bg-white shadow-sm py-4 px-6">
+<header class="bg-primary/70 shadow-md py-4 px-6">
     <div class="container mx-auto flex justify-between items-center">
-        <a href="index.html" class="text-primary text-2xl font-['Pacifico'] font-bold">Aqua Track</a>
-        <div id="nav-links" class="flex items-center space-x-4"></div>
+        <a href="index.html" class="text-white text-2xl font-cute">🐟 Aqua Track</a>
     </div>
 </header>
 
-<div class="flex justify-center items-center py-16 px-4">
-    <div class="bg-white rounded shadow-sm p-8 w-full max-w-md">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">로그인</h2>
+<main class="flex-grow flex justify-center items-center px-4 py-16">
+    <div class="card p-10 w-full max-w-md text-gray-800">
+        <h2 class="text-3xl text-center mb-6 text-primary">🐠 로그인</h2>
 
-        <div class="mb-6">
-            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+        <div class="mb-4">
+            <label for="email" class="block text-sm mb-1">이메일</label>
             <div class="relative">
-                <i class="ri-mail-line absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400"></i>
+                <i class="ri-mail-line absolute left-3 top-3.5 text-primary text-lg"></i>
                 <input type="email" id="email" placeholder="이메일을 입력해주세요"
-                       class="w-full pl-10 pr-3 py-3 border border-gray-200 rounded text-gray-800 bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-colors" />
+                       class="w-full pl-10 pr-3 py-3 border border-primary/30 rounded-button text-gray-800 bg-white focus:ring-2 focus:ring-primary" />
             </div>
         </div>
 
-        <div class="mb-6">
-            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">비밀번호</label>
+        <div class="mb-4">
+            <label for="password" class="block text-sm mb-1">비밀번호</label>
             <div class="relative">
-                <i class="ri-lock-line absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400"></i>
+                <i class="ri-lock-line absolute left-3 top-3.5 text-primary text-lg"></i>
                 <input type="password" id="password" placeholder="비밀번호를 입력해주세요"
-                       class="w-full pl-10 pr-10 py-3 border border-gray-200 rounded text-gray-800 bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-colors" />
-                <div class="absolute inset-y-0 right-0 pr-3 flex items-center password-toggle">
-                    <i class="ri-eye-line text-gray-400 hover:text-gray-600" id="password-toggle-icon"></i>
+                       class="w-full pl-10 pr-10 py-3 border border-primary/30 rounded-button text-gray-800 bg-white focus:ring-2 focus:ring-primary" />
+                <div class="absolute right-3 top-3.5 password-toggle text-primary hover:text-accent">
+                    <i class="ri-eye-line" id="password-toggle-icon"></i>
                 </div>
             </div>
         </div>
 
-        <div class="flex justify-between items-center mb-6">
-            <div class="flex items-center">
+        <div class="flex justify-between items-center mb-4 text-sm">
+            <label class="flex items-center">
                 <input type="checkbox" id="remember" class="mr-2" />
-                <label for="remember" class="text-sm text-gray-600">로그인 상태 유지</label>
-            </div>
-            <div class="text-sm">
-                <a href="find-password.html" class="text-gray-500 hover:text-primary">비밀번호 찾기</a>
-            </div>
+                로그인 유지
+            </label>
+            <a href="find-password.html" class="text-primary hover:underline">비밀번호 찾기</a>
         </div>
 
         <p id="login-error" class="text-red-500 text-sm font-semibold mb-4 hidden">
             이메일 또는 비밀번호가 올바르지 않습니다.
         </p>
-        <button id="login-button" class="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-button mb-4">
-            로그인
+
+        <button id="login-button"
+                class="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-button mb-3 shadow hover:scale-105 transition">
+            <i class="ri-login-box-line mr-2"></i> 로그인
         </button>
 
         <button onclick="window.location.href='signup.html'"
-                class="w-full bg-white border border-primary text-primary hover:bg-primary/5 py-3 rounded-button">
-            회원가입
+                class="w-full border border-primary text-primary bg-white py-3 rounded-button hover:bg-primary/10 transition">
+            <i class="ri-user-add-line mr-2"></i> 회원가입
         </button>
-        </div>
     </div>
+</main>
 
-<!-- <script>
-    const passwordToggle = document.querySelector('.password-toggle');
-    const passwordInput = document.getElementById('password');
-    const passwordToggleIcon = document.getElementById('password-toggle-icon');
-
-    passwordToggle.addEventListener('click', function () {
-        const isPassword = passwordInput.type === 'password';
-        passwordInput.type = isPassword ? 'text' : 'password';
-        passwordToggleIcon.classList.toggle('ri-eye-line', !isPassword);
-        passwordToggleIcon.classList.toggle('ri-eye-off-line', isPassword);
-    });
-
-    const loginButton = document.getElementById('login-button');
-    loginButton.addEventListener('click', function () {
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value.trim();
-
-        if (!email || !password) {
-            alert('이메일과 비밀번호를 모두 입력해주세요.');
-            return;
-        }
-
-        fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        })
-            .then(res => {
-                if (!res.ok) throw new Error('로그인 실패');
-                return res.json();
-            })
-            .then(data => {
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('loggedIn', 'true');
-                alert('로그인 성공');
-                location.href = 'index.html';
-            })
-            .catch(err => {
-                alert(err.message);
-            });
-    });
-</script> -->
 <script>
-    // 무조건 로그인 상태 초기화
+    // 초기화
     localStorage.removeItem('token');
     localStorage.removeItem('loggedIn');
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('loggedIn');
-</script>
 
-<script type="module" src="./js/login.js"></script>
-<script type="module">
-    import { renderNavbar } from './js/nav.js';
-    renderNavbar();
+    // 비밀번호 보기 토글
+    document.querySelector('.password-toggle').addEventListener('click', () => {
+        const pwInput = document.getElementById('password');
+        const icon = document.getElementById('password-toggle-icon');
+        const showing = pwInput.type === 'text';
+        pwInput.type = showing ? 'password' : 'text';
+        icon.className = showing ? 'ri-eye-line' : 'ri-eye-off-line';
+    });
 </script>
+<script type="module" src="./js/login.js"></script>
 </body>
 </html>
