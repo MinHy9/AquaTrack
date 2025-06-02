@@ -6,6 +6,7 @@ import com.aquatrack.aquarium.entity.Aquarium;
 import com.aquatrack.user.entity.User;
 import com.aquatrack.aquarium.repository.AquariumRepository;
 import com.aquatrack.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -68,6 +69,13 @@ public class AquariumService {
         return aquariumRepository.findByUser_UserId(userId)
                 .map(aquarium -> aquarium.getAquariumId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저의 어항이 없습니다."));
+    }
+    //어항 삭제
+    @Transactional
+    public void deleteAquarium(Long aquariumId) {
+        Aquarium aquarium = aquariumRepository.findById(aquariumId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 어항을 찾을 수 없습니다."));
+        aquariumRepository.delete(aquarium);
     }
 
     //기준값 수정 API

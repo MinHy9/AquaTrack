@@ -78,6 +78,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h3 class="text-lg font-semibold">${aq.name}</h3>
                 <p class="text-gray-700">어종: ${aq.fishName}</p>
                 <p class="text-sm text-gray-500">ID: ${aq.aquariumId}</p>
+                <button class="delete-btn mt-2 text-sm text-red-600 hover:underline" data-id="${aq.aquariumId}">
+                삭제
+                </button>
               </div>
             `).join('');
             // ✅ 목록이 렌더링된 후에 첫 번째 어항을 선택 상태로 저장
@@ -111,7 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (isLoggedIn) {
         nav.innerHTML = `
-        <a href="index.html" class="text-primary hover:text-primary/80">대시보드</a>
         <a href="aquarium-register.html" class="text-primary hover:text-primary/80">어항 등록</a>
         <a href="#" class="text-primary hover:text-primary/80" onclick="logout()">로그아웃</a>
       `;
@@ -138,6 +140,51 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.remove('bg-gray-100', 'text-gray-700');
             btn.classList.add('bg-blue-100', 'text-blue-700');
         });
+    });
+
+    // 삭제 버튼 클릭 시 어항 삭제
+    document.addEventListener("click", async function (event) {
+        if (event.target.classList.contains("delete-btn")) {
+            const aquariumId = event.target.getAttribute("data-id");
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+            if (confirm("정말 이 어항을 삭제하시겠습니까?")) {
+                try {
+                    const res = await fetch(`${API_BASE}/api/aquariums/${aquariumId}`, {
+                        method: "DELETE",
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (res.ok) {
+                        alert("어항이 삭제되었습니다.");
+                        // 1. DOM에서 어항 카드 제거
+                        const card = document.querySelector(`.aquarium-card[data-id="${aquariumId}"]`);
+                        if (card) card.remove();
+
+                        // 2. 선택된 어항이 삭제된 경우, 새로 선택할 어항 지정
+                        const currentSelected = localStorage.getItem('selectedAquariumId');
+                        if (currentSelected === aquariumId) {
+                            const remainingCards = document.querySelectorAll('.aquarium-card');
+                            if (remainingCards.length > 0) {
+                                const newId = remainingCards[0].dataset.id;
+                                localStorage.setItem('selectedAquariumId', newId);
+                                console.log("🔁 새로운 어항 선택됨:", newId);
+                            } else {
+                                localStorage.removeItem('selectedAquariumId');
+                                console.log("🧼 모든 어항이 삭제됨");
+                            }
+                        }
+                    } else {
+                        const msg = await res.text();
+                        alert(`삭제 실패: ${msg}`);
+                    }
+                } catch (err) {
+                    alert("에러 발생: " + err.message);
+                }
+            }
+        }
     });
 });
 

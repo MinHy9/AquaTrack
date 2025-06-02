@@ -47,6 +47,12 @@ public class AquariumController {
         return ResponseEntity.ok(aquarium);
     }
 
+    @DeleteMapping("/{aquariumId}")
+    public ResponseEntity<Void> deleteAquarium(@PathVariable Long aquariumId) {
+        aquariumService.deleteAquarium(aquariumId);
+        return ResponseEntity.noContent().build();
+    }
+
     // 온도, 탁도, pH 설정 기준값 설정
     @PutMapping("/{aquariumId}/thresholds")
     public ResponseEntity<String> updateThresholds(@PathVariable Long aquariumId,
