@@ -1,6 +1,7 @@
 package com.aquatrack.feeding.entity;
 
 import com.aquatrack.aquarium.entity.Aquarium;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -19,6 +20,7 @@ public class FeedingSchedule {
 
     @ManyToOne
     @JoinColumn(name = "aquarium_id")
+    @JsonBackReference
     private Aquarium aquarium;
 
     private String time; // 예: "08:00", "18:00"
