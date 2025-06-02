@@ -30,12 +30,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String token = resolveToken(request);
+        System.out.println("🪪 요청된 토큰: " + token);
+
         if (token != null && jwtTokenProvider.validateToken(token)) {
+            System.out.println("✅ 토큰 유효함");
+
             String email = jwtTokenProvider.getEmailFromToken(token);
+            System.out.println("✅ 이메일: " + email);
+
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
+            System.out.println("🔐 SecurityContextHolder 인증 완료");
+        } else {
+            System.out.println("❌ 토큰 없음 또는 유효하지 않음");
         }
 
         filterChain.doFilter(request, response);

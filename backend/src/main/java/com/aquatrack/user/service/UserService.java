@@ -6,6 +6,7 @@ import com.aquatrack.user.dto.UserRegisterRequest;
 import com.aquatrack.user.entity.User;
 import com.aquatrack.common.security.JwtTokenProvider;
 import com.aquatrack.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
 
     private final UserRepository userRepository;
@@ -73,9 +75,21 @@ public class UserService {
     }
 
     //비밀번호 변경
-    public void changePassword(User user, String newPassword) {
-        user.setPassword(passwordEncoder.encode(newPassword));
+    @Transactional
+    public void changePassword(Long userId, String newPassword) {
+        System.out.println("🔑 비밀번호 변경 요청 → userId: " + userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("❌ 해당 사용자를 찾을 수 없습니다."));
+
+        String oldPassword = user.getPassword();
+        String encodedNewPassword = passwordEncoder.encode(newPassword);
+        user.setPassword(encodedNewPassword);
         userRepository.save(user);
+
+        System.out.println("✅ 변경 완료!");
+        System.out.println("🔒 이전 암호화 비밀번호: " + oldPassword);
+        System.out.println("🔐 새 암호화 비밀번호: " + encodedNewPassword);
     }
 
     //비밀번호 리셋

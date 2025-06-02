@@ -110,20 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //자동어종표시
     //updateFishSelect(); // 자동 어종 표시
-
-    //로그인상태
-    const nav = document.getElementById('nav-links');
-
-    if (isLoggedIn) {
-        nav.innerHTML = `
-        <a href="aquarium-register.html" class="text-primary hover:text-primary/80">어항 등록</a>
-        <a href="#" class="text-primary hover:text-primary/80" onclick="logout()">로그아웃</a>
-      `;
-    } else {
-        nav.innerHTML = `
-        <a href="login.html" class="text-primary hover:text-primary/80">로그인</a>
-      `;
-    }
     window.logout = function () {
         localStorage.removeItem('loggedIn');
         localStorage.removeItem('token');
