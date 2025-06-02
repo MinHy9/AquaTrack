@@ -15,4 +15,7 @@ public class AquariumRequest {
 
     @NotBlank
     private String fishName;
+
+    @NotBlank
+    private String boardId;
 }

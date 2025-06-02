@@ -30,6 +30,9 @@ public class Aquarium {
     private List<FeedingSchedule> feedingSchedules;
     private String name; // 어항 이름 (예: "내 첫 번째 어항")
 
+    @Column(name = "board_id", unique = true)
+    private String boardId;
+
     @CreationTimestamp
     private LocalDateTime registeredDate;
 

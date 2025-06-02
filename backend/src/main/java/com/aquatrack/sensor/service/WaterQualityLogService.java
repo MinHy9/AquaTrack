@@ -11,6 +11,8 @@ import com.aquatrack.aquarium.repository.AquariumRepository;
 import com.aquatrack.sensor.repository.WaterQualityLogRepository;
 import com.aquatrack.feeding.service.FeedingStateService;
 import com.aquatrack.notification.service.NotificationService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -113,4 +115,34 @@ public class WaterQualityLogService {
         // Alert 생성과 동시에 Notification 전송
         notificationService.sendNotification(saved);
     }
+
+
+    public void saveFromBoardMessage(String jsonPayload) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode json = objectMapper.readTree(jsonPayload);
+
+            String boardId = json.get("boardId").asText();
+            float temperature = (float) json.get("temperature").asDouble();
+            float ph = (float) json.get("ph").asDouble();
+            float turbidity = (float) json.get("turbidity").asDouble();
+
+            Aquarium aquarium = aquariumRepository.findByBoardId(boardId)
+                    .orElseThrow(() -> new RuntimeException("등록되지 않은 보드 ID입니다: " + boardId));
+
+            WaterQualityLogRequest request = new WaterQualityLogRequest();
+            request.setAquariumId(aquarium.getAquariumId());
+            request.setUserId(String.valueOf(aquarium.getUser().getUserId()));
+            request.setTemperature(temperature);
+            request.setPH(ph);
+            request.setTurbidity(turbidity);
+
+            save(request); // 기존 save() 메서드 활용
+
+        } catch (Exception e) {
+            System.err.println("MQTT 메시지 처리 중 오류: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 }

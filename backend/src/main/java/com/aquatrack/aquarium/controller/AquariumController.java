@@ -1,6 +1,7 @@
 package com.aquatrack.aquarium.controller;
 
 import com.aquatrack.aquarium.dto.AquariumRequest;
+import com.aquatrack.aquarium.dto.AquariumResponse;
 import com.aquatrack.aquarium.dto.AquariumThresholdResponse;
 import com.aquatrack.aquarium.dto.AquariumThresholdUpdateRequest;
 import com.aquatrack.aquarium.entity.Aquarium;
@@ -33,12 +34,11 @@ public class AquariumController {
 
     // 내 어항 목록 조회
     @GetMapping
-    public ResponseEntity<List<Aquarium>> getMyAquariums() {
-        // 🔧 여기 수정
+    public ResponseEntity<List<AquariumResponse>> getMyAquariums() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = userDetails.getUsername();
 
-        return ResponseEntity.ok(aquariumService.getMyAquariums(email));
+        return ResponseEntity.ok(aquariumService.getMyAquariumResponses(email)); // ✅ 새 메서드 호출
     }
 
     // 어항 ID로 단일 어항 정보 조회

@@ -15,4 +15,8 @@ public interface AquariumRepository extends JpaRepository<Aquarium, Long> {
     Optional<Aquarium> findByUserEmail(String email);
 
     Optional<Aquarium> findByUser_UserId(Long userId);//id로 유저찾기
+
+    boolean existsByBoardId(String boardId);
+
+    Optional<Aquarium> findByBoardId(String boardId);
 }

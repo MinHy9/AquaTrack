@@ -1,6 +1,7 @@
 package com.aquatrack.aquarium.service;
 
 import com.aquatrack.aquarium.dto.AquariumRequest;
+import com.aquatrack.aquarium.dto.AquariumResponse;
 import com.aquatrack.aquarium.dto.AquariumThresholdResponse;
 import com.aquatrack.aquarium.dto.AquariumThresholdUpdateRequest;
 import com.aquatrack.aquarium.entity.Aquarium;
@@ -24,23 +25,28 @@ public class AquariumService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
 
+        if (aquariumRepository.existsByBoardId(request.getBoardId())) {
+            throw new IllegalArgumentException("이미 등록된 보드 ID입니다.");
+        }
+
         Float minTemp = 24.0f;
         Float maxTemp = 27.0f;
         Float minPH = 6.5f;
         Float maxPH = 8.0f;
-        Float maxTurbidity = 300.0f;
+        Float maxTurbidity = 11.0f;
 
         if (request.getFishName().equalsIgnoreCase("금붕어")) {
             minTemp = 18.0f;
             maxTemp = 24.0f;
             minPH = 7.0f;
             maxPH = 8.5f;
-            maxTurbidity = 250.0f;
+            maxTurbidity = 11.0f;
         }
 
         Aquarium aquarium = Aquarium.builder()
                 .name(request.getName())
                 .fishName(request.getFishName())
+                .boardId(request.getBoardId())
                 .customMinTemperature(minTemp)
                 .customMaxTemperature(maxTemp)
                 .customMinPH(minPH)
@@ -59,6 +65,21 @@ public class AquariumService {
 
         return aquariumRepository.findByUser(user);
     }
+
+    public List<AquariumResponse> getMyAquariumResponses(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
+
+        return aquariumRepository.findByUser(user).stream()
+                .map(aq -> new AquariumResponse(
+                        aq.getAquariumId(),
+                        aq.getName(),
+                        aq.getFishName(),
+                        aq.getBoardId()
+                ))
+                .toList();
+    }
+
 
     public Aquarium getAquariumById(Long id) {
         return aquariumRepository.findById(id)

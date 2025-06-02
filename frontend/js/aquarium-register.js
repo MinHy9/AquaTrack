@@ -4,6 +4,7 @@ import { API_BASE, AUTH_HEADER } from './config.js';
 document.getElementById('register-btn').addEventListener('click', () => {
     const name  = document.getElementById('aq-name').value.trim();
     const fishName = document.getElementById('aq-fishName').value.trim();
+    const boardId = document.getElementById("boardId").value.trim();
     if (!name || !fishName) {
         alert('모든 필드를 입력해주세요.');
         return;
@@ -15,7 +16,7 @@ document.getElementById('register-btn').addEventListener('click', () => {
             ...AUTH_HEADER,
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ name, fishName })
+        body: JSON.stringify({ name, fishName, boardId })
     })
         .then(res => {
             if (!res.ok) throw new Error('어항 등록 실패');

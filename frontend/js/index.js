@@ -79,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <div class="p-4 border rounded hover:shadow aquarium-card" data-id="${aq.aquariumId}">
                 <h3 class="text-lg font-semibold">${aq.name}</h3>
                 <p class="text-gray-700">어종: ${aq.fishName}</p>
+                <p class="text-gray-600">보드 ID: ${aq.boardId}</p>
                 <p class="text-sm text-gray-500">ID: ${aq.aquariumId}</p>
                 <button class="delete-btn mt-2 text-sm text-red-600 hover:underline" data-id="${aq.aquariumId}">
                 삭제
