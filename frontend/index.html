@@ -178,11 +178,11 @@
             <div class="space-y-4">
                 <div class="flex justify-between items-center">
                     <div class="text-gray-700">마지막 급식</div>
-                    <div class="text-gray-900 font-medium">오늘 08:00</div>
+                    <div id="last-feed-time" class="text-gray-900 font-medium">오늘 08:00</div>
                 </div>
                 <div class="flex justify-between items-center">
                     <div class="text-gray-700">다음 급식</div>
-                    <div class="text-gray-900 font-medium">오늘 20:00</div>
+                    <div id="next-feed-time" class="text-gray-900 font-medium">오늘 20:00</div>
                 </div>
                 <button id="feeder-btn" class="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-button mt-4 whitespace-nowrap">
                     수동 급식
@@ -293,10 +293,6 @@
     if (!isLoggedIn) {
         window.location.href = 'login.html';
     }
-</script>
-<script type="module">
-    import { renderNavbar } from './js/nav.js';
-    renderNavbar();
 </script>
 <script type="module" src="./js/index.js"></script>
 </body>

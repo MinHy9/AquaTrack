@@ -21,9 +21,9 @@ public class FeedingService {
     private final MqttService mqttService; // IoT 통신용 서비스
 
     // 자동 급여 스케줄 등록
-    public FeedingSchedule registerSchedule(FeedingScheduleRequest request, CustomUserDetails userDetails) {
+    public FeedingSchedule registerSchedule(FeedingScheduleRequest request, String email) {
         Aquarium aquarium = aquariumRepository.findById(request.getAquariumId())
-                .filter(a -> a.getUser().getUserId().equals(userDetails.getUser().getUserId()))
+                .filter(a -> a.getUser().getEmail().equals(email))
                 .orElseThrow(() -> new RuntimeException("어항이 없습니다"));
 
         FeedingSchedule schedule = FeedingSchedule.builder()
@@ -35,22 +35,19 @@ public class FeedingService {
         return scheduleRepository.save(schedule);
     }
     //사용자지정 급여시간 등록
-    public void registerMultipleSchedules(Long aquariumId, List<String> times, CustomUserDetails userDetails) {
-        Aquarium aquarium = aquariumRepository.findById(aquariumId)
-                .filter(a -> a.getUser().getUserId().equals(userDetails.getUser().getUserId()))
-                .orElseThrow(() -> new RuntimeException("어항이 없습니다"));
+    public void registerMultipleSchedules(List<FeedingScheduleRequest> requests, String email) {
+        for (FeedingScheduleRequest req : requests) {
+            Aquarium aquarium = aquariumRepository.findById(req.getAquariumId())
+                    .filter(a -> a.getUser().getEmail().equals(email))
+                    .orElseThrow(() -> new RuntimeException("어항 없음"));
 
-        scheduleRepository.deleteByAquarium(aquarium);
-
-        for (String time : times) {
-            boolean exists = scheduleRepository.existsByAquariumAndTime(aquarium, time);
-            if (exists) continue; // 이미 있으면 저장 안함
-
+            // 중복 체크는 필요시 추가 가능
             FeedingSchedule schedule = FeedingSchedule.builder()
                     .aquarium(aquarium)
-                    .time(time)
+                    .time(req.getTime())
                     .enabled(true)
                     .build();
+
             scheduleRepository.save(schedule);
         }
     }
@@ -64,9 +61,9 @@ public class FeedingService {
         return true;
     }
 
-    public List<FeedingSchedule> getSchedules(Long aquariumId, CustomUserDetails userDetails) {
+    public List<FeedingSchedule> getSchedules(Long aquariumId, String email) {
         Aquarium aquarium = aquariumRepository.findById(aquariumId)
-                .filter(a -> a.getUser().getUserId().equals(userDetails.getUser().getUserId()))
+                .filter(a -> a.getUser().getEmail().equals(email))
                 .orElseThrow(() -> new RuntimeException("해당 어항은 현재 사용자 소유가 아닙니다."));
         return scheduleRepository.findByAquariumAndEnabledTrue(aquarium);
     }

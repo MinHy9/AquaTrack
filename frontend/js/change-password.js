@@ -17,7 +17,7 @@ document.getElementById('change-password-btn').addEventListener('click', () => {
         return;
     }
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (!token) {
         alert('로그인이 필요합니다. 다시 로그인해주세요.');
         location.href = 'login.html';

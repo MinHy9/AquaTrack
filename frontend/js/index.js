@@ -3,6 +3,8 @@ import {initDashboard} from "./dashboard.js";
 import {bindControlButtons} from "./control.js";
 import {initFeedingSettings} from "./feeding.js";
 import {initThresholdSettings} from "./threshold.js";
+import { renderNavbar } from './nav.js';
+renderNavbar();
 console.log("✅ index.js 로딩됨");
 const API_BASE = location.origin.includes("localhost") ? "http://localhost:8080" : location.origin;
 
@@ -11,9 +13,10 @@ async function updateFishSelect() {
     if (!aquariumId) return;
 
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    if (!token) {
-        console.warn("🚫 토큰 없음 - updateFishSelect 중단");
-        return;
+    if (token) {
+        renderNavbar(true);
+    } else {
+        renderNavbar(false);
     }
 
     try {

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,38 +22,44 @@ public class FeedingController {
     // 스케줄 등록 (자동 급여 시간 설정)
     @PostMapping("/schedule")
     public ResponseEntity<?> registerSchedule(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody FeedingScheduleRequest request) {
-        return ResponseEntity.ok(feedingService.registerSchedule(request, userDetails));
+
+        String email = userDetails.getUsername(); // 이메일 기반 사용자 식별
+        return ResponseEntity.ok(feedingService.registerSchedule(request, email));
     }
+
     // 사용자 지정 급여시간 설정
     @PostMapping("/schedules")
     public ResponseEntity<?> registerMultipleSchedules(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody FeedingScheduleRequest request) {
-        feedingService.registerMultipleSchedules(request.getAquariumId(), request.getFeedingTimes(), userDetails);
-        return ResponseEntity.ok("다중 급식 시간이 저장되었습니다.");
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody List<FeedingScheduleRequest> requests) {
+
+        String email = userDetails.getUsername();
+        feedingService.registerMultipleSchedules(requests, email);
+
+        return ResponseEntity.ok("등록 완료!");
+    }
+
+    @GetMapping("/schedule/{aquariumId}")
+    public ResponseEntity<?> getSchedules(
+            @PathVariable Long aquariumId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String email = userDetails.getUsername();
+        return ResponseEntity.ok(feedingService.getSchedules(aquariumId, email));
     }
 
     // 수동 급여 (즉시 먹이 주기)
     @PostMapping("/manual/{aquariumId}")
     public ResponseEntity<?> feedNow(
             @PathVariable Long aquariumId,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-        String userId = String.valueOf(userDetails.getUser().getUserId());
-        boolean result = feedingService.feedNow(userId, aquariumId);
+        String email = userDetails.getUsername();
+        boolean result = feedingService.feedNow(email, aquariumId);
 
         if (result) return ResponseEntity.ok("급여 성공!");
         else return ResponseEntity.status(HttpStatus.CONFLICT).body("자동 급여 상태가 비활성화되어 수동 급여만 가능");
-    }
-
-
-    // 현재 스케줄 조회
-    @GetMapping("/schedule/{aquariumId}")
-    public ResponseEntity<?> getSchedules(
-            @PathVariable Long aquariumId,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ResponseEntity.ok(feedingService.getSchedules(aquariumId, userDetails));
     }
 }
