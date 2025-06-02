@@ -216,21 +216,31 @@
                         class="absolute top-0 right-0 mt-6 mr-6 px-3 py-1 bg-primary text-white rounded hover:bg-primary/90 text-sm">
                     설정 저장
                 </button>
+                <p id="save-success-msg" class="text-green-600 text-sm mt-2 hidden">
+                    ✔ 기준값이 성공적으로 저장되었습니다.
+                </p>
+                <p id="setting-warning" class="text-sm text-red-500 mt-2">
+                    ⚠ 표시된 값은 임시 기본값입니다. <strong>‘설정 저장’</strong> 버튼을 눌러야 실제로 적용됩니다.
+                </p>
                 <div>
                     <label class="block text-gray-700 mb-2">권장 수온 (최소 / 최대)</label>
                     <div class="grid grid-cols-2 gap-2">
-                        <input id="cfg-temp-min" type="number" placeholder="최소" class="p-2 border rounded text-sm" />
-                        <input id="cfg-temp-max" type="number" placeholder="최대" class="p-2 border rounded text-sm" />
+                        <input id="min-temp" type="number" placeholder="최소" class="p-2 border rounded text-sm" />
+                        <input id="max-temp" type="number" placeholder="최대" class="p-2 border rounded text-sm" />
                     </div>
                     <label class="block text-gray-700 mb-2 mt-4">권장 pH (최소 / 최대)</label>
                     <div class="grid grid-cols-2 gap-2">
-                        <input id="cfg-ph-min" type="number" placeholder="최소" class="p-2 border rounded text-sm" />
-                        <input id="cfg-ph-max" type="number" placeholder="최대" class="p-2 border rounded text-sm" />
+                        <input id="min-ph" type="number" placeholder="최소" class="p-2 border rounded text-sm" />
+                        <input id="max-ph" type="number" placeholder="최대" class="p-2 border rounded text-sm" />
                     </div>
                     <label class="block text-gray-700 mb-2 mt-4">권장 탁도 (최대)</label>
                     <div class="grid grid-cols-2 gap-2">
-                        <input id="cfg-turb-max" type="number" placeholder="최대" class="p-2 border rounded text-sm" />
+                        <input type="hidden" id="min-turb" value="0.0">
+                        <input id="max-turb" type="number" placeholder="최대" class="p-2 border rounded text-sm" />
                     </div>
+                    <p class="text-sm text-gray-500 mt-2">
+                        * 기준값이 등록되지 않은 경우, 기본값 (수온 24~27°C, pH 6.5~8.0, 탁도 0~11 NTU)이 자동 적용됩니다.
+                    </p>
                 </div>
                 <div>
                     <label class="block text-gray-700 mb-2">급식 주기</label>

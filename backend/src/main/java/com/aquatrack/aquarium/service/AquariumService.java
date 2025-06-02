@@ -1,6 +1,7 @@
 package com.aquatrack.aquarium.service;
 
 import com.aquatrack.aquarium.dto.AquariumRequest;
+import com.aquatrack.aquarium.dto.AquariumThresholdResponse;
 import com.aquatrack.aquarium.dto.AquariumThresholdUpdateRequest;
 import com.aquatrack.aquarium.entity.Aquarium;
 import com.aquatrack.user.entity.User;
@@ -90,5 +91,19 @@ public class AquariumService {
         a.setCustomMaxTurbidity(req.getMaxTurbidity());
 
         aquariumRepository.save(a);
+    }
+
+    public AquariumThresholdResponse getThresholds(Long aquariumId) {
+        Aquarium aquarium = aquariumRepository.findById(aquariumId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 어항이 존재하지 않습니다."));
+
+        return new AquariumThresholdResponse(
+                aquarium.getCustomMinTemperature(),
+                aquarium.getCustomMaxTemperature(),
+                aquarium.getCustomMinPH(),
+                aquarium.getCustomMaxPH(),
+                0.0f, // ← minTurbidity 필드가 없음 → 기본값 설정 또는 DTO에서 제거
+                aquarium.getCustomMaxTurbidity()
+        );
     }
 }

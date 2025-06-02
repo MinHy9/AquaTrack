@@ -26,7 +26,6 @@ async function updateFishSelect() {
         if (!res.ok) throw new Error('어항 정보를 불러오지 못했습니다');
 
         const data = await res.json();
-        document.getElementById('fish-select').value = data.fishName;
     } catch (err) {
         console.error(err);
     }

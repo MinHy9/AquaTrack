@@ -1,6 +1,7 @@
 package com.aquatrack.aquarium.controller;
 
 import com.aquatrack.aquarium.dto.AquariumRequest;
+import com.aquatrack.aquarium.dto.AquariumThresholdResponse;
 import com.aquatrack.aquarium.dto.AquariumThresholdUpdateRequest;
 import com.aquatrack.aquarium.entity.Aquarium;
 import com.aquatrack.aquarium.service.AquariumService;
@@ -59,5 +60,10 @@ public class AquariumController {
                                                    @RequestBody AquariumThresholdUpdateRequest req) {
         aquariumService.updateThresholds(aquariumId, req);
         return ResponseEntity.ok("기준값 수정 완료");
+    }
+
+    @GetMapping("/{aquariumId}/thresholds")
+    public ResponseEntity<AquariumThresholdResponse> getThresholds(@PathVariable Long aquariumId) {
+        return ResponseEntity.ok(aquariumService.getThresholds(aquariumId));
     }
 }
