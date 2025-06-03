@@ -17,6 +17,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -36,12 +40,16 @@ public class WaterQualityLogService {
         // 1. 상태 판별(status 저장됨)
         boolean isNormal = isWaterConditionNormal(aquarium, request);
 
+        // 한국 시간을 가져와 UTC Instant로 변환
+        Instant recordedAtUTC = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).toInstant();
+
         WaterQualityLog log = WaterQualityLog.builder()
                 .aquarium(aquarium)
                 .temperature(request.getTemperature())
                 .pH(request.getPH())
                 .turbidity(request.getTurbidity())
                 .status(isNormal ? "NORMAL" : "DANGER")
+                .recordedAt(recordedAtUTC.atZone(ZoneId.systemDefault()).toLocalDateTime())
                 .build();
 
         WaterQualityLog savedLog = logRepository.save(log);

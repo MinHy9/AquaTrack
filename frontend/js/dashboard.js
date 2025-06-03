@@ -1,4 +1,5 @@
 import { API_BASE } from './config.js';
+import { updateChartsRealtime } from './chart.js';
 
 let stompClient;
 
@@ -10,6 +11,7 @@ export function initDashboard() {
         stompClient.subscribe('/topic/sensor', (message) => {
             const data = JSON.parse(message.body);
             updateSensorCards(data);
+            // updateChartsRealtime(data); // Disable real-time chart updates
         });
     });
 }

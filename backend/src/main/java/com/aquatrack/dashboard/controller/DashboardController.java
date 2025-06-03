@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @RestController
@@ -34,7 +36,7 @@ public class DashboardController {
                 .temperature(latestLog.getTemperature())
                 .pH(latestLog.getPH())
                 .turbidity(latestLog.getTurbidity())
-                .recordedAt(latestLog.getRecordedAt())
+                .recordedAt(latestLog.getRecordedAt().atZone(ZoneId.systemDefault()).toLocalDateTime())
                 .build());
     }
 
@@ -59,7 +61,7 @@ public class DashboardController {
                         aquarium.getCustomMaxPH()))
                 .turbidity(log.getTurbidity())
                 .turbidityStatus(log.getTurbidity() > aquarium.getCustomMaxTurbidity() ? "경고" : "정상")
-                .recordedAt(log.getRecordedAt())
+                .recordedAt(log.getRecordedAt().atZone(ZoneId.systemDefault()).toLocalDateTime())
                 .build());
     }
 

@@ -3,8 +3,8 @@ package com.aquatrack.sensor.entity;
 import com.aquatrack.aquarium.entity.Aquarium;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -30,6 +30,5 @@ public class WaterQualityLog {
     @Column(nullable = false)
     private String status;
 
-    @CreationTimestamp
     private LocalDateTime recordedAt;
 }

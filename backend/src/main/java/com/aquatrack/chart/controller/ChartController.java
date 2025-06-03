@@ -20,7 +20,7 @@ public class ChartController {
 
     private final StatsService statsService;
 
-    @GetMapping("/{range}") // range = daily, weekly, monthly
+    @GetMapping("/{range}") // range = daily, weekly, monthly, hourly
     public ResponseEntity<ChartDataResponse> getChart(@PathVariable String range, Principal principal) {
         String email = principal.getName();
         List<DailySensorStatResponse> stats;
@@ -28,6 +28,7 @@ public class ChartController {
         switch (range) {
             case "weekly" -> stats = statsService.getWeeklyStats(email);
             case "monthly" -> stats = statsService.getMonthlyStats(email);
+            case "hourly" -> stats = statsService.getHourlyStats(email);
             default -> stats = statsService.getDailyStats(email);
         }
 

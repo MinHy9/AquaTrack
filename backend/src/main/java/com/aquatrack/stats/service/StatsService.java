@@ -5,6 +5,7 @@ import com.aquatrack.stats.dto.DailySensorStatResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -22,5 +23,10 @@ public class StatsService {
 
     public List<DailySensorStatResponse> getMonthlyStats(String email) {
         return logRepository.getMonthlyStats(email);
+    }
+
+    public List<DailySensorStatResponse> getHourlyStats(String email) {
+        LocalDateTime startTime = LocalDateTime.now().minusHours(24);
+        return logRepository.getHourlyStats(email, startTime);
     }
 }

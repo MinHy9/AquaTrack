@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Component
@@ -24,7 +25,7 @@ public class ScheduledNotificationSender {
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime tenMinutesAgo = now.minusMinutes(10);
-        List<WaterQualityLog> logs = waterQualityLogRepository.findByRecordedAtAfter(tenMinutesAgo);
+        List<WaterQualityLog> logs = waterQualityLogRepository.findByRecordedAtAfter(tenMinutesAgo.atZone(ZoneId.systemDefault()).toInstant());
 
         for (WaterQualityLog log : logs) {
             if (log.getAquarium() == null || log.getAquarium().getUser() == null) continue;
@@ -48,7 +49,7 @@ public class ScheduledNotificationSender {
                 AlertStatusTracker.StatusInfo status = alertStatusTracker.getStatusInfo(aquariumId);
 
                 if (status == null) {
-                    alertStatusTracker.updateAbnormalState(aquariumId, log.getRecordedAt());
+                    alertStatusTracker.updateAbnormalState(aquariumId, log.getRecordedAt().atZone(ZoneId.systemDefault()).toLocalDateTime());
                     continue;
                 }
 
