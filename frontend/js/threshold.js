@@ -35,8 +35,8 @@ export function initThresholdSettings() {
             aquariumId,
             minTemperature: minTempVal ? parseFloat(minTempVal) : 24.0,
             maxTemperature: maxTempVal ? parseFloat(maxTempVal) : 27.0,
-            minPh: minPhVal ? parseFloat(minPhVal) : 6.5,
-            maxPh: maxPhVal ? parseFloat(maxPhVal) : 8.0,
+            minPH: minPhVal ? parseFloat(minPhVal) : 6.5,
+            maxPH: maxPhVal ? parseFloat(maxPhVal) : 8.0,
             minTurbidity: parseFloat(minTurbVal),
             maxTurbidity: maxTurbVal ? parseFloat(maxTurbVal) : 11.0,
 
@@ -45,7 +45,7 @@ export function initThresholdSettings() {
             alert("최소 수온은 최대 수온보다 작아야 합니다.");
             return;
         }
-        if (body.minPh >= body.maxPh) {
+        if (body.minPH >= body.maxPH) {
             alert("최소 pH는 최대 pH보다 작아야 합니다.");
             return;
         }

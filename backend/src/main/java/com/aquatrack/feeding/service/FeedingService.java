@@ -57,7 +57,10 @@ public class FeedingService {
         boolean canFeed = feedingStateService.isAutoFeedingEnabled(aquariumId);
         if (!canFeed) return false;
 
-        mqttService.publishToDevice(userId, aquariumId, "feeding", "feed_now");
+        String boardId = aquariumRepository.findById(aquariumId)
+            .orElseThrow(() -> new RuntimeException("어항을 찾을 수 없습니다: " + aquariumId))
+            .getBoardId();
+        mqttService.publishToDevice(boardId, "feeding", "feed_now");
         return true;
     }
 

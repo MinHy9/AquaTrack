@@ -27,13 +27,13 @@ public class FeedingScheduler {
         List<FeedingSchedule> dueSchedules = scheduleRepository.findByTime(timeStr);
 
         for (FeedingSchedule schedule : dueSchedules) {
-            Long aquariumId = schedule.getAquarium().getAquariumId();
+            String boardId = schedule.getAquarium().getBoardId();
 
-            if (feedingStateService.isAutoFeedingEnabled(aquariumId)) {
-                mqttService.publish("aquatrack/" + aquariumId + "/feeding", "feed_now");
-                System.out.println("[자동급여] " + now + " → 어항 " + aquariumId + "에 feed_now 명령 전송");
+            if (feedingStateService.isAutoFeedingEnabled(schedule.getAquarium().getAquariumId())) {
+                mqttService.publishToDevice(boardId, "feeding", "feed_now");
+                System.out.println("[자동급여] " + now + " → 보드 " + boardId + "에 feed_now 명령 전송");
             } else {
-                System.out.println("[자동급여 차단] " + now + " → 어항 " + aquariumId + "은 자동급여 비활성화 상태");
+                System.out.println("[자동급여 차단] " + now + " → 보드 " + boardId + "은 자동급여 비활성화 상태");
             }
         }
     }

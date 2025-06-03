@@ -90,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const firstId = list[0].aquariumId;
             localStorage.setItem('selectedAquariumId', firstId);
             updateFishSelect(); // 이 시점에 호출해야 정상 작동
+            initCharts(); // 어항 선택 후 차트 초기화 및 데이터 로딩
         } catch (e) {
             document.getElementById('list-container').innerHTML =
                 `<p class="text-red-500">목록 불러오기 실패: ${e.message}</p>`;
@@ -107,6 +108,28 @@ document.addEventListener('DOMContentLoaded', () => {
         // 시각적 강조 (선택된 카드)
         document.querySelectorAll('.aquarium-card').forEach(c => c.classList.remove('ring-2', 'ring-blue-500'));
         card.classList.add('ring-2', 'ring-blue-500');
+
+        // ✅ 추가: .metric-btn 클릭 시 차트 업데이트
+        document.querySelectorAll('.metric-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.metric-btn').forEach(b => {
+                    b.classList.remove('bg-blue-100', 'text-blue-700');
+                    b.classList.add('bg-gray-100', 'text-gray-700');
+                });
+                btn.classList.remove('bg-gray-100', 'text-gray-700');
+                btn.classList.add('bg-blue-100', 'text-blue-700');
+            });
+        });
+
+        // ✅ 추가: metric 버튼 클릭 시 singleChart 업데이트
+        document.querySelectorAll('.metric-btn[data-metric]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const metric = btn.dataset.metric;
+                const activeRangeButton = document.querySelector('.metric-btn[data-range].bg-blue-100');
+                const range = activeRangeButton ? activeRangeButton.dataset.range : 'daily';
+                updateSingleChart(metric, range);
+            });
+        });
     });
 
     //자동어종표시
@@ -165,6 +188,19 @@ document.addEventListener('DOMContentLoaded', () => {
                                 console.log("🧼 모든 어항이 삭제됨");
                             }
                         }
+                        // 어항 삭제 후 차트 및 데이터 새로고침
+                        const remainingCards = document.querySelectorAll('.aquarium-card');
+                        if (remainingCards.length > 0) {
+                             const newId = remainingCards[0].dataset.id;
+                             localStorage.setItem('selectedAquariumId', newId);
+                             updateFishSelect();
+                             initCharts(); // 새 어항 선택 후 차트 새로고침
+                         } else {
+                             localStorage.removeItem('selectedAquariumId');
+                             console.log("🧼 모든 어항이 삭제됨");
+                             // 모든 어항 삭제 시 차트 초기화 또는 숨김 처리 필요
+                             // 현재는 페이지 새로고침으로 처리될 것으로 예상
+                         }
                     } else {
                         const msg = await res.text();
                         alert(`삭제 실패: ${msg}`);
