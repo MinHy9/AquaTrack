@@ -47,7 +47,12 @@ public class FeedingController {
             @AuthenticationPrincipal UserDetails userDetails) {
 
         String email = userDetails.getUsername();
-        return ResponseEntity.ok(feedingService.getSchedules(aquariumId, email));
+        try {
+            return ResponseEntity.ok(feedingService.getSchedules(aquariumId, email));
+        } catch (RuntimeException e) {
+            // Assuming RuntimeException from service indicates aquarium not found or not owned
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     // 수동 급여 (즉시 먹이 주기)

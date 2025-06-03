@@ -15,9 +15,9 @@ export function initDashboard() {
 }
 
 function updateSensorCards(data) {
-    document.querySelector('.temp-card .value').textContent = data.temperature.toFixed(1);
-    document.querySelector('.ph-card .value').textContent = data.ph.toFixed(1);
-    document.querySelector('.turb-card .value').textContent = data.turbidity.toFixed(1);
+    document.querySelector('.bg-blue-100 .text-3xl').textContent = data.temperature.toFixed(1);
+    document.querySelector('.bg-green-100 .text-3xl').textContent = data.ph.toFixed(1);
+    document.querySelector('.bg-purple-100 .text-3xl').textContent = data.turbidity.toFixed(1);
 
     const statusCard = document.getElementById('status-card');
     const statusText = document.getElementById('status-text');
