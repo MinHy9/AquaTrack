@@ -5,7 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-/backend/certs/
+/certs/
 
 ### STS ###
 .apt_generated
