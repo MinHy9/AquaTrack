@@ -2,18 +2,55 @@ import { API_BASE } from './config.js';
 import { updateChartsRealtime } from './chart.js';
 
 let stompClient;
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 5;
 
 export function initDashboard() {
+    connectWebSocket();
+}
+
+function connectWebSocket() {
     const socket = new SockJS(`${API_BASE}/ws`);
     stompClient = Stomp.over(socket);
+    
+    // 디버그 모드 활성화
+    stompClient.debug = function(str) {
+        console.log('STOMP: ' + str);
+    };
 
-    stompClient.connect({}, () => {
-        stompClient.subscribe('/topic/sensor', (message) => {
-            const data = JSON.parse(message.body);
-            updateSensorCards(data);
-            // updateChartsRealtime(data); // Disable real-time chart updates
-        });
-    });
+    stompClient.connect({}, 
+        // 성공 콜백
+        () => {
+            console.log('WebSocket 연결 성공');
+            reconnectAttempts = 0;
+            
+            stompClient.subscribe('/topic/sensor', (message) => {
+                try {
+                    const data = JSON.parse(message.body);
+                    console.log('수신된 센서 데이터:', data);
+                    console.log('데이터 상태:', data.status);
+                    console.log('온도:', data.temperature);
+                    updateSensorCards(data);
+                } catch (error) {
+                    console.error('메시지 처리 중 오류:', error);
+                }
+            });
+        },
+        // 에러 콜백
+        (error) => {
+            console.error('WebSocket 연결 실패:', error);
+            console.error('연결 실패 상세:', error.headers);
+            console.error('연결 실패 메시지:', error.body);
+            
+            if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                reconnectAttempts++;
+                console.log(`재연결 시도 ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}`);
+                setTimeout(connectWebSocket, 5000); // 5초 후 재연결 시도
+            } else {
+                console.error('최대 재연결 시도 횟수 초과');
+            }
+        }
+    );
 }
 
 function updateSensorCards(data) {
@@ -27,7 +64,7 @@ function updateSensorCards(data) {
     const alertText = document.getElementById('danger-alert');
     const statusBadge = document.getElementById('status-badge');
 
-    if (data.status === 'danger') {
+    if (data.status.toLowerCase() === 'danger') {
         statusCard.classList.remove('status-normal');
         statusCard.classList.add('status-danger');
         statusText.textContent = '위험 상태';

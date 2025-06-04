@@ -12,11 +12,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // 클라이언트가 연결할 웹소켓 엔드포인트
         registry.addEndpoint("/ws")
-                .setAllowedOrigins(
-                    "http://localhost:3000",
-                    "http://localhost:5500",
-                    "http://localhost:8080"
-                )
+                .setAllowedOriginPatterns("*")  // 모든 도메인 허용
                 .withSockJS(); // SockJS fallback
     }
 

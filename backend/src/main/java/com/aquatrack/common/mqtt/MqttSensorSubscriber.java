@@ -54,8 +54,21 @@ public class MqttSensorSubscriber {
                     request.setPH(ph);
                     request.setTurbidity(turbidity);
 
-                    WaterQualityLog savedLog = logService.save(request);
-                    sensorSocketSender.send(savedLog); // ✅ WebSocket 알림도 유지
+                    try {
+                        WaterQualityLog savedLog = logService.save(request);
+                        sensorSocketSender.send(savedLog); // ✅ WebSocket 알림도 유지
+                    } catch (Exception e) {
+                        log.error("❌ 센서 데이터 저장 중 오류 발생: {}", e.getMessage());
+                        // 저장 실패 시에도 현재 데이터로 웹소켓 전송
+                        WaterQualityLog tempLog = WaterQualityLog.builder()
+                                .aquarium(aquarium)
+                                .temperature(temperature)
+                                .pH(ph)
+                                .turbidity(turbidity)
+                                .status(isWaterConditionNormal(aquarium, temperature, ph, turbidity) ? "NORMAL" : "DANGER")
+                                .build();
+                        sensorSocketSender.send(tempLog);
+                    }
 
                 } catch (Exception e) {
                     log.error("❌ 센서 메시지 처리 실패: {}", e.getMessage(), e);
@@ -67,5 +80,13 @@ public class MqttSensorSubscriber {
         } catch (MqttException e) {
             log.error("❌ MQTT 센서 토픽 구독 실패: {}", e.getMessage(), e);
         }
+    }
+
+    private boolean isWaterConditionNormal(Aquarium aquarium, float temperature, float ph, float turbidity) {
+        return temperature >= aquarium.getCustomMinTemperature() && 
+               temperature <= aquarium.getCustomMaxTemperature() &&
+               ph >= aquarium.getCustomMinPH() && 
+               ph <= aquarium.getCustomMaxPH() &&
+               turbidity <= aquarium.getCustomMaxTurbidity();
     }
 }
