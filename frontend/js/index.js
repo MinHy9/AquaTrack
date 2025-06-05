@@ -4,9 +4,11 @@ import {bindControlButtons} from "./control.js";
 import {initFeedingSettings} from "./feeding.js";
 import {initThresholdSettings} from "./threshold.js";
 import { renderNavbar } from './nav.js';
+import { loadChartData, loadSingleChartData } from './chart.js';
+import { API_BASE, AUTH_HEADER } from './config.js';
+
 renderNavbar();
 console.log("✅ index.js 로딩됨");
-const API_BASE = location.origin.includes("localhost") ? "http://localhost:8080" : location.origin;
 
 async function updateFishSelect() {
     const aquariumId = localStorage.getItem('selectedAquariumId');
@@ -51,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
         guestMessage.classList.add('hidden');
         listContainer.classList.remove('hidden');
     }
-    initCharts(); // 차트 초기화만 우선
+    // initCharts(); // 차트 초기화만 우선 - 중복 호출 제거
     initDashboard(); // 실시간 센서 수치 표시용
     bindControlButtons();//제버튼 클릭
     initFeedingSettings();//먹이 공급관련
@@ -76,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             container.innerHTML = list.map(aq => `
-              <div class="p-4 border rounded hover:shadow aquarium-card" data-id="${aq.aquariumId}">
+              <div class="p-4 border rounded hover:shadow aquarium-card" data-id="${aq.aquariumId}" data-boardid="${aq.boardId}">
                 <h3 class="text-lg font-semibold">${aq.name}</h3>
                 <p class="text-gray-700">어종: ${aq.fishName}</p>
                 <p class="text-gray-600">보드 ID: ${aq.boardId}</p>
@@ -87,8 +89,9 @@ document.addEventListener('DOMContentLoaded', () => {
               </div>
             `).join('');
             // ✅ 목록이 렌더링된 후에 첫 번째 어항을 선택 상태로 저장
-            const firstId = list[0].aquariumId;
-            localStorage.setItem('selectedAquariumId', firstId);
+            const firstAquarium = list[0];
+            localStorage.setItem('selectedAquariumId', firstAquarium.aquariumId);
+            localStorage.setItem('selectedAquariumBoardId', firstAquarium.boardId); // 보드 ID 저장
             updateFishSelect(); // 이 시점에 호출해야 정상 작동
             initCharts(); // 어항 선택 후 차트 초기화 및 데이터 로딩
         } catch (e) {
@@ -96,18 +99,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 `<p class="text-red-500">목록 불러오기 실패: ${e.message}</p>`;
         }
     })();
-    // 카드 클릭 시 선택된 어항 ID 저장
+    // 카드 클릭 시 선택된 어항 ID 및 보드 ID 저장
     document.addEventListener('click', e => {
         const card = e.target.closest('.aquarium-card');
         if (!card) return;
 
         const id = card.dataset.id;
+        const boardId = card.dataset.boardid; // 보드 ID 가져오기
         localStorage.setItem('selectedAquariumId', id);
-        console.log(`어항 ${id} 선택됨`);
+        localStorage.setItem('selectedAquariumBoardId', boardId); // 보드 ID 저장
+        console.log(`어항 ${id} 선택됨 (보드 ID: ${boardId})`);
 
         // 시각적 강조 (선택된 카드)
         document.querySelectorAll('.aquarium-card').forEach(c => c.classList.remove('ring-2', 'ring-blue-500'));
         card.classList.add('ring-2', 'ring-blue-500');
+
+        // 환경 설정 값 업데이트
+        fetch(`${API_BASE}/api/aquariums/${id}/thresholds`, {
+            headers: AUTH_HEADER
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('min-temp').value = data.minTemperature ?? 24.0;
+            document.getElementById('max-temp').value = data.maxTemperature ?? 27.0;
+            document.getElementById('min-ph').value = data.minPH ?? 6.5;
+            document.getElementById('max-ph').value = data.maxPH ?? 8.0;
+            document.getElementById('min-turb').value = data.minTurbidity ?? 0.0;
+            document.getElementById('max-turb').value = data.maxTurbidity ?? 11.0;
+        })
+        .catch(error => {
+            console.error('환경 설정 값 로드 중 오류 발생:', error);
+        });
+
+        // 차트 업데이트
+        const activeRangeButton = document.querySelector('.multi-chart-range-btn.bg-blue-100');
+        const range = activeRangeButton ? activeRangeButton.dataset.range : 'daily';
+        loadChartData(range);
+
+        const activeMetricButton = document.querySelector('.metric-btn[data-metric].bg-blue-100');
+        if (activeMetricButton) {
+            const metric = activeMetricButton.dataset.metric;
+            loadSingleChartData(metric, range);
+        }
 
         // ✅ 추가: .metric-btn 클릭 시 차트 업데이트
         document.querySelectorAll('.metric-btn').forEach(btn => {
@@ -127,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const metric = btn.dataset.metric;
                 const activeRangeButton = document.querySelector('.metric-btn[data-range].bg-blue-100');
                 const range = activeRangeButton ? activeRangeButton.dataset.range : 'daily';
-                updateSingleChart(metric, range);
+                loadSingleChartData(metric, range);
             });
         });
     });

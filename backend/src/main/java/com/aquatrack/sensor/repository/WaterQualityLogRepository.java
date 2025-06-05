@@ -16,48 +16,50 @@ import java.util.Optional;
 @Repository
 public interface WaterQualityLogRepository extends JpaRepository<WaterQualityLog, Long> {
     List<WaterQualityLog> findTop10ByAquariumOrderByRecordedAtDesc(Aquarium aquarium);
-    // 일간 통계
+    // 일간 통계 (어항별)
     @Query("SELECT new com.aquatrack.stats.dto.DailySensorStatResponse(" +
             "DATE(w.recordedAt), " +
             "AVG(w.temperature), " +
             "AVG(w.pH), " +
             "AVG(w.turbidity)) " +
             "FROM WaterQualityLog w " +
-            "WHERE w.aquarium.user.email = :email " +
+            "WHERE w.aquarium.aquariumId = :aquariumId " +
             "GROUP BY DATE(w.recordedAt) " +
             "ORDER BY DATE(w.recordedAt) ASC")
-    List<DailySensorStatResponse> getDailyStatsByUser(@Param("email") String email);
+    List<DailySensorStatResponse> getDailyStatsByAquarium(@Param("aquariumId") Long aquariumId);
 
-    // 주간 통계
+    // 주간 통계 (어항별)
     @Query("SELECT new com.aquatrack.stats.dto.DailySensorStatResponse(" +
             "FUNCTION('DATE_FORMAT', w.recordedAt, '%x-W%v'), " +
             "AVG(w.temperature), AVG(w.pH), AVG(w.turbidity)) " +
             "FROM WaterQualityLog w " +
-            "WHERE w.aquarium.user.email = :email " +
+            "WHERE w.aquarium.aquariumId = :aquariumId " +
             "GROUP BY FUNCTION('DATE_FORMAT', w.recordedAt, '%x-W%v') " +
             "ORDER BY FUNCTION('DATE_FORMAT', w.recordedAt, '%x-W%v') ASC")
-    List<DailySensorStatResponse> getWeeklyStats(@Param("email") String email);
+    List<DailySensorStatResponse> getWeeklyStatsByAquarium(@Param("aquariumId") Long aquariumId);
 
-    // 월간 통계
+    // 월간 통계 (어항별)
     @Query("SELECT new com.aquatrack.stats.dto.DailySensorStatResponse(" +
             "FUNCTION('DATE_FORMAT', w.recordedAt, '%Y-%m'), " +
             "AVG(w.temperature), AVG(w.pH), AVG(w.turbidity)) " +
             "FROM WaterQualityLog w " +
-            "WHERE w.aquarium.user.email = :email " +
+            "WHERE w.aquarium.aquariumId = :aquariumId " +
             "GROUP BY FUNCTION('DATE_FORMAT', w.recordedAt, '%Y-%m') " +
             "ORDER BY FUNCTION('DATE_FORMAT', w.recordedAt, '%Y-%m') ASC")
-    List<DailySensorStatResponse> getMonthlyStats(@Param("email") String email);
+    List<DailySensorStatResponse> getMonthlyStatsByAquarium(@Param("aquariumId") Long aquariumId);
 
-    // 시간별 통계 (최근 24시간 - 시간대 변환 없음)
+    // 시간별 통계 (어항별)
     @Query("SELECT new com.aquatrack.stats.dto.DailySensorStatResponse(" +
             "FUNCTION('DATE_FORMAT', w.recordedAt, '%Y-%m-%d %H:00'), " +
             "AVG(w.temperature), AVG(w.pH), AVG(w.turbidity)) " +
             "FROM WaterQualityLog w " +
-            "WHERE w.aquarium.user.email = :email " +
+            "WHERE w.aquarium.aquariumId = :aquariumId " +
             "AND w.recordedAt >= :startTime " +
             "GROUP BY FUNCTION('DATE_FORMAT', w.recordedAt, '%Y-%m-%d %H:00') " +
             "ORDER BY FUNCTION('DATE_FORMAT', w.recordedAt, '%Y-%m-%d %H:00') ASC")
-    List<DailySensorStatResponse> getHourlyStats(@Param("email") String email, @Param("startTime") LocalDateTime startTime);
+    List<DailySensorStatResponse> getHourlyStatsByAquarium(
+            @Param("aquariumId") Long aquariumId,
+            @Param("startTime") LocalDateTime startTime);
 
     //실시간 센서값
     Optional<WaterQualityLog> findTopByAquarium_User_EmailOrderByRecordedAtDesc(String email);

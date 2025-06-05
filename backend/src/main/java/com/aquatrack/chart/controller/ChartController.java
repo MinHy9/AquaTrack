@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
@@ -20,26 +21,19 @@ public class ChartController {
 
     private final StatsService statsService;
 
-    @GetMapping("/{range}") // range = daily, weekly, monthly, hourly
-    public ResponseEntity<ChartDataResponse> getChart(@PathVariable String range, Principal principal) {
-        String email = principal.getName();
+    @GetMapping("/{type}")
+    public ResponseEntity<List<DailySensorStatResponse>> getChartData(
+            @PathVariable String type,
+            @RequestParam String boardId) {
         List<DailySensorStatResponse> stats;
-
-        switch (range) {
-            case "weekly" -> stats = statsService.getWeeklyStats(email);
-            case "monthly" -> stats = statsService.getMonthlyStats(email);
-            case "hourly" -> stats = statsService.getHourlyStats(email);
-            default -> stats = statsService.getDailyStats(email);
+        switch (type) {
+            case "daily" -> stats = statsService.getDailyStatsByBoard(boardId);
+            case "weekly" -> stats = statsService.getWeeklyStatsByBoard(boardId);
+            case "monthly" -> stats = statsService.getMonthlyStatsByBoard(boardId);
+            case "hourly" -> stats = statsService.getHourlyStatsByBoard(boardId);
+            default -> throw new IllegalArgumentException("잘못된 차트 타입입니다: " + type);
         }
-
-        ChartDataResponse response = ChartDataResponse.builder()
-                .categories(stats.stream().map(s -> s.getDateLabel().toString()).toList())
-                .temperature(stats.stream().map(DailySensorStatResponse::getTemperatureAvg).toList())
-                .ph(stats.stream().map(DailySensorStatResponse::getPHAvg).toList())
-                .turbidity(stats.stream().map(DailySensorStatResponse::getTurbidityAvg).toList())
-                .build();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(stats);
     }
 }
 

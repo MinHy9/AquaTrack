@@ -68,19 +68,23 @@ function updateSensorCards(data) {
         statusCard.classList.remove('status-normal');
         statusCard.classList.add('status-danger');
         statusText.textContent = '위험 상태';
+        statusText.classList.add('text-red-600');
         statusBadge.textContent = '위험';
         statusBadge.classList.remove('bg-green-100', 'text-green-800');
         statusBadge.classList.add('bg-red-100', 'text-red-800');
         statusDesc.textContent = '하나 이상의 수질 지표가 위험 범위에 있습니다.';
+        statusDesc.classList.add('text-red-600');
         alertText.classList.remove('hidden');
     } else {
         statusCard.classList.remove('status-danger');
         statusCard.classList.add('status-normal');
         statusText.textContent = '정상 상태';
+        statusText.classList.remove('text-red-600');
         statusBadge.textContent = '정상';
         statusBadge.classList.remove('bg-red-100', 'text-red-800');
         statusBadge.classList.add('bg-green-100', 'text-green-800');
         statusDesc.textContent = '모든 수질 지표가 정상 범위 내에 있습니다.';
+        statusDesc.classList.remove('text-red-600');
         alertText.classList.add('hidden');
     }
 }

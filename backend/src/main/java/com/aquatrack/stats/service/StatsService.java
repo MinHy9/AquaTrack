@@ -2,6 +2,8 @@ package com.aquatrack.stats.service;
 
 import com.aquatrack.sensor.repository.WaterQualityLogRepository;
 import com.aquatrack.stats.dto.DailySensorStatResponse;
+import com.aquatrack.aquarium.repository.AquariumRepository;
+import com.aquatrack.aquarium.entity.Aquarium;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,21 +14,30 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StatsService {
     private final WaterQualityLogRepository logRepository;
+    private final AquariumRepository aquariumRepository;
 
-    public List<DailySensorStatResponse> getDailyStats(String email) {
-        return logRepository.getDailyStatsByUser(email);
+    public List<DailySensorStatResponse> getDailyStatsByBoard(String boardId) {
+        Aquarium aquarium = aquariumRepository.findByBoardId(boardId)
+                .orElseThrow(() -> new RuntimeException("등록되지 않은 보드 ID입니다: " + boardId));
+        return logRepository.getDailyStatsByAquarium(aquarium.getAquariumId());
     }
 
-    public List<DailySensorStatResponse> getWeeklyStats(String email) {
-        return logRepository.getWeeklyStats(email);
+    public List<DailySensorStatResponse> getWeeklyStatsByBoard(String boardId) {
+        Aquarium aquarium = aquariumRepository.findByBoardId(boardId)
+                .orElseThrow(() -> new RuntimeException("등록되지 않은 보드 ID입니다: " + boardId));
+        return logRepository.getWeeklyStatsByAquarium(aquarium.getAquariumId());
     }
 
-    public List<DailySensorStatResponse> getMonthlyStats(String email) {
-        return logRepository.getMonthlyStats(email);
+    public List<DailySensorStatResponse> getMonthlyStatsByBoard(String boardId) {
+        Aquarium aquarium = aquariumRepository.findByBoardId(boardId)
+                .orElseThrow(() -> new RuntimeException("등록되지 않은 보드 ID입니다: " + boardId));
+        return logRepository.getMonthlyStatsByAquarium(aquarium.getAquariumId());
     }
 
-    public List<DailySensorStatResponse> getHourlyStats(String email) {
+    public List<DailySensorStatResponse> getHourlyStatsByBoard(String boardId) {
+        Aquarium aquarium = aquariumRepository.findByBoardId(boardId)
+                .orElseThrow(() -> new RuntimeException("등록되지 않은 보드 ID입니다: " + boardId));
         LocalDateTime startTime = LocalDateTime.now().minusHours(24);
-        return logRepository.getHourlyStats(email, startTime);
+        return logRepository.getHourlyStatsByAquarium(aquarium.getAquariumId(), startTime);
     }
 }

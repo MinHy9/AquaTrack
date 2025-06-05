@@ -4,12 +4,11 @@ import com.aquatrack.stats.dto.DailySensorStatResponse;
 import com.aquatrack.stats.service.StatsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -19,17 +18,17 @@ public class StatsController {
     private final StatsService statsService;
 
     @GetMapping("/daily")
-    public ResponseEntity<List<DailySensorStatResponse>> getDailyStats(Principal principal) {
-        return ResponseEntity.ok(statsService.getDailyStats(principal.getName()));
+    public ResponseEntity<List<DailySensorStatResponse>> getDailyStats(@RequestParam String boardId) {
+        return ResponseEntity.ok(statsService.getDailyStatsByBoard(boardId));
     }
 
     @GetMapping("/weekly")
-    public ResponseEntity<List<DailySensorStatResponse>> getWeeklyStats(Principal principal) {
-        return ResponseEntity.ok(statsService.getWeeklyStats(principal.getName()));
+    public ResponseEntity<List<DailySensorStatResponse>> getWeeklyStats(@RequestParam String boardId) {
+        return ResponseEntity.ok(statsService.getWeeklyStatsByBoard(boardId));
     }
 
     @GetMapping("/monthly")
-    public ResponseEntity<List<DailySensorStatResponse>> getMonthlyStats(Principal principal) {
-        return ResponseEntity.ok(statsService.getMonthlyStats(principal.getName()));
+    public ResponseEntity<List<DailySensorStatResponse>> getMonthlyStats(@RequestParam String boardId) {
+        return ResponseEntity.ok(statsService.getMonthlyStatsByBoard(boardId));
     }
 }
