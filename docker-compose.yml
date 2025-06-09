@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  backend:
+    build: ./backend
+    container_name: aquatrack_backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    container_name: aquatrack_frontend
+    ports:
+      - "5500:80"
+    depends_on:
+      - backend
+
+  db:
+    image: mysql:8
+    container_name: aquatrack_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: aquatrack
+      MYSQL_USER: aquatrack
+      MYSQL_PASSWORD: aquapass
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+volumes:
+  db_data:
