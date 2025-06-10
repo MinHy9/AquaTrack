@@ -22,7 +22,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
             if [ ! -d AquaTrack ]; then
-              git clone https://github.com/YOUR_USERNAME/AquaTrack.git
+              git clone https://github.com/sjy61115/AquaTrack.git
             fi
             cd AquaTrack
             git pull origin main
