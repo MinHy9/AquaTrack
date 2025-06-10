@@ -65,3 +65,22 @@
   1. ESP32 → AWS IoT Core로 MQTT Publish
   2. Spring → MqttSensorSubscriber에서 수신 후 DB 저장
   3. 상태 판단 후 SensorSocketSender를 통해 WebSocket 푸시
+
+## API 연동 흐름
+
+- **프론트 JS**는 `localStorage`에 저장된 `selectedAquariumId`를 기반으로 백엔드 API 호출
+- 센서 데이터 실시간 구독: `/topic/sensor`
+- 설정 저장: `POST /api/config`
+- 수동 제어: `POST /api/device/control`
+- 통계 조회: `GET /api/stats/daily`, `/weekly`, `/monthly`
+- 급식 등록: `POST /api/feeding/schedule`
+- 급식 실행: `POST /api/feeding/manual`
+
+---
+
+## 개발/배포 환경
+
+- **개발 IDE**: IntelliJ
+- **빌드 도구**: Gradle
+- **테스트 도구**: Postman, WebSocket Client
+- **배포**: Docker + AWS EC2 + AWS IoT Core
