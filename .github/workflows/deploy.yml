@@ -24,7 +24,7 @@ jobs:
             if [ ! -d AquaTrack ]; then
               git clone https://github.com/sjy61115/AquaTrack.git
             fi
-            cd AquaTrack
+            cd ~/AquaTrack
             git pull origin main
             docker-compose down
             docker-compose up -d --build
