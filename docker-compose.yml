@@ -22,7 +22,7 @@ services:
     image: mysql:8
     container_name: aquatrack_db
     environment:
-      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: aquatrack
       MYSQL_USER: aquatrack
       MYSQL_PASSWORD: aquapass
