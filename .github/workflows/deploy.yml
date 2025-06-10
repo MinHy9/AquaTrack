@@ -18,6 +18,11 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
+      - name: 📦 Upload .env to EC2
+        run: |
+          echo "${{ secrets.ENV_BACKEND }}" > backend.env
+          scp -o StrictHostKeyChecking=no backend.env ubuntu@${{ secrets.EC2_HOST }}:~/AquaTrack/backend/.env
+
       - name: 🚀 Deploy via SSH
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
