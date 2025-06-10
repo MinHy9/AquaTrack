@@ -1,25 +1,31 @@
-name: Deploy to AWS
+name: Deploy AquaTrack to EC2
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main  # 또는 master
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📦 Checkout
+      - name: ✅ Checkout repository
         uses: actions/checkout@v3
 
-      - name: 🔐 SSH to EC2 & deploy
-        uses: appleboy/ssh-action@master
+      - name: ✅ Set up SSH key
+        uses: webfactory/ssh-agent@v0.8.0
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd ~/AquaTrack
-            git pull
-            docker compose down
-            docker compose up -d --build
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: 🚀 Deploy via SSH
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+            if [ ! -d AquaTrack ]; then
+              git clone https://github.com/YOUR_USERNAME/AquaTrack.git
+            fi
+            cd AquaTrack
+            git pull origin main
+            docker-compose down
+            docker-compose up -d --build
+          EOF
