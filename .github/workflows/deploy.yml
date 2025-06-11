@@ -3,7 +3,7 @@ name: Deploy AquaTrack to EC2
 on:
   push:
     branches:
-      - main  # 또는 master
+      - main
 
 jobs:
   deploy:
@@ -18,11 +18,7 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-      - name: 📦 Upload frontend build to EC2
-        run: |
-          scp -r -o StrictHostKeyChecking=no frontend ubuntu@${{ secrets.EC2_HOST }}:~/AquaTrack/
-
-      - name: 📦 Upload .env to EC2
+      - name: 📦 Upload .env file to EC2
         run: |
           echo "${{ secrets.ENV_BACKEND }}" > backend.env
           scp -o StrictHostKeyChecking=no backend.env ubuntu@${{ secrets.EC2_HOST }}:~/AquaTrack/backend/.env
@@ -30,11 +26,16 @@ jobs:
       - name: 🚀 Deploy via SSH
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+            
             if [ ! -d AquaTrack ]; then
               git clone https://github.com/sjy61115/AquaTrack.git
             fi
             cd ~/AquaTrack
+
+            
             git pull origin main
-            docker-compose down
-            docker-compose up -d --build
+
+            
+            docker compose down
+            docker compose up -d --build
           EOF

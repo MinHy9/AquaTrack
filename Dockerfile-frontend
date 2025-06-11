@@ -4,6 +4,9 @@ FROM nginx:alpine
 # 기존 default.conf 삭제 (optional)
 RUN rm /etc/nginx/conf.d/default.conf
 
+# 🔥 Nginx 설정파일 복사 (이게 있어야 nginx가 index.html을 서빙함)
+COPY frontend/default.conf /etc/nginx/conf.d/default.conf
+
 # 정적 파일 복사
 COPY frontend /usr/share/nginx/html
 
