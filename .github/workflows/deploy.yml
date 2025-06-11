@@ -1,4 +1,4 @@
-name: Deploy AquaTrack to EC2
+name: Deploy AquaTrack to NCP
 
 on:
   push:
@@ -16,28 +16,27 @@ jobs:
       - name: 🔐 Set up SSH agent
         uses: webfactory/ssh-agent@v0.8.0
         with:
-          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+          ssh-private-key: ${{ secrets.NCP_SSH_KEY }}
 
       - name: 🔎 Test SSH Connection
-        run: ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'echo SSH connection successful.'
+        run: ssh -o StrictHostKeyChecking=no root@${{ secrets.NCP_HOST }} 'echo SSH connection successful.'
 
-      - name: 📦 Upload backend .env to EC2
+      - name: 📦 Upload backend .env to NCP
         run: |
-          echo "${{ secrets.ENV_BACKEND }}" > backend.env
-          scp -o StrictHostKeyChecking=no backend.env ubuntu@${{ secrets.EC2_HOST }}:~/AquaTrack/backend/.env || true
+          echo "${{ secrets.NCP_ENV_BACKEND }}" > backend.env
+          scp -o StrictHostKeyChecking=no backend.env root@${{ secrets.NCP_HOST }}:/root/AquaTrack/backend/.env || true
 
-      - name: 🚀 Deploy to EC2
+      - name: 🚀 Deploy to NCP
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.NCP_HOST }} << 'EOF'
             set -e
-            cd ~
-          
-            # repo 없으면 clone, 있으면 pull 전 clean
+            cd /root
+
             if [ ! -d AquaTrack ]; then
               echo "📥 Cloning AquaTrack repository..."
               git clone https://github.com/sjy61115/AquaTrack.git
             fi
-          
+
             cd AquaTrack
 
             echo "🧹 Cleaning untracked files..."
