@@ -11,7 +11,9 @@ services:
       - db
 
   frontend:
-    build: ./frontend
+    build:
+        context: ./frontend
+        dockerfile: ../Dockerfile-frontend
     container_name: aquatrack_frontend
     ports:
       - "5500:80"
