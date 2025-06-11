@@ -13,32 +13,41 @@ jobs:
       - name: ✅ Checkout repository
         uses: actions/checkout@v3
 
-      - name: ✅ Set up SSH key
+      - name: 🔐 Set up SSH agent
         uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-      - name: 🧪 Test SSH Connection
-        run: ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'echo SSH OK'
+      - name: 🔎 Test SSH Connection
+        run: ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'echo SSH connection successful.'
 
-      - name: 📦 Upload .env file to EC2
+      - name: 📦 Upload backend .env to EC2
         run: |
           echo "${{ secrets.ENV_BACKEND }}" > backend.env
-          scp -o StrictHostKeyChecking=no backend.env ubuntu@${{ secrets.EC2_HOST }}:~/AquaTrack/backend/.env
+          scp -o StrictHostKeyChecking=no backend.env ubuntu@${{ secrets.EC2_HOST }}:~/AquaTrack/backend/.env || true
 
-      - name: 🚀 Deploy via SSH
+      - name: 🚀 Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
-            
+            set -e
+            cd ~
+          
+            # repo 없으면 clone, 있으면 pull 전 clean
             if [ ! -d AquaTrack ]; then
+              echo "📥 Cloning AquaTrack repository..."
               git clone https://github.com/sjy61115/AquaTrack.git
             fi
-            cd ~/AquaTrack
+          
+            cd AquaTrack
 
-            
+            echo "🧹 Cleaning untracked files..."
+            git reset --hard
+            git clean -fd
+
+            echo "🔄 Pulling latest code..."
             git pull origin main
 
-            
+            echo "🐳 Restarting Docker containers..."
             docker-compose down
             docker-compose up -d --build
           EOF
