@@ -1,0 +1,28 @@
+# 공통 무시 대상
+.git
+.gitignore
+README.md
+Dockerfile
+Dockerfile-frontend
+.env
+*.log
+
+# IDE 관련
+.vscode
+.idea
+
+# 프론트엔드 빌드 결과물 중복 방지
+frontend/node_modules
+frontend/.env
+frontend/.git
+
+# 백엔드 불필요한 것
+backend/node_modules
+backend/.env
+backend/.git
+
+# 포함시켜야 할 정적 파일 예외 처리 (frontend 빌드가 정적 HTML이면)
+!frontend/*.html
+!frontend/*.js
+!frontend/*.css
+!frontend/default.conf
