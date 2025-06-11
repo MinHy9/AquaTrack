@@ -18,6 +18,16 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
+      - name: 🔨 Build frontend
+        run: |
+          cd frontend
+          npm install
+          npm run build
+
+      - name: 📦 Upload frontend build to EC2
+        run: |
+          scp -r -o StrictHostKeyChecking=no frontend/build ubuntu@${{ secrets.EC2_HOST }}:~/AquaTrack/frontend/
+
       - name: 📦 Upload .env to EC2
         run: |
           echo "${{ secrets.ENV_BACKEND }}" > backend.env
