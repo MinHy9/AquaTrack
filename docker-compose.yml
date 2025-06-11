@@ -10,6 +10,8 @@ services:
     depends_on:
       - db
     restart: always
+    volumes:
+      - ./backend/certs:/app/certs
 
   frontend:
     build:
