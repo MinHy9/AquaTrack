@@ -19,7 +19,7 @@ jobs:
           ssh-private-key: ${{ secrets.NCP_SSH_KEY }}
 
       - name: 🔎 Test SSH Connection
-        run: ssh -o StrictHostKeyChecking=no root@${{ secrets.NCP_HOST }} 'echo SSH connection successful.'
+        run: ssh -v -o StrictHostKeyChecking=no root@${{ secrets.NCP_HOST }} 'echo SSH connection successful.'
 
       - name: 📦 Upload backend .env to NCP
         run: |
