@@ -6,7 +6,7 @@ RUN rm /etc/nginx/conf.d/default.conf
 
 # 🔥 정적 파일과 nginx 설정 복사 (이게 있어야 nginx가 index.html을 서빙함)
 COPY default.conf /etc/nginx/conf.d/default.conf
-COPY .. /usr/share/nginx/html
+COPY . /usr/share/nginx/html
 
 EXPOSE 80
 
