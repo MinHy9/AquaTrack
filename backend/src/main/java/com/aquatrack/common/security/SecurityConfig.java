@@ -69,7 +69,7 @@ public class SecurityConfig {
             "http://localhost:3000",
             "http://localhost:5500",
             "http://localhost:8080",
-                "http://211.188.61.154:5500"
+                "http://211.188.59.51:5500"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
