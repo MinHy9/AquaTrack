@@ -24,8 +24,9 @@ public class AlertStatusTracker {
 
     // 최초 비정상 상태 감지 시
     public void updateAbnormalState(Long aquariumId, LocalDateTime detectedTime) {
-        aquariumStatusMap.putIfAbsent(aquariumId, new StatusInfo(detectedTime, null));
+        aquariumStatusMap.computeIfAbsent(aquariumId, id -> new StatusInfo(detectedTime, null));
     }
+
 
     // 알림 전송 시간 갱신
     public void updateAlertSentTime(Long aquariumId, LocalDateTime alertTime) {
