@@ -1,5 +1,5 @@
 import {initCharts} from "./chart.js";
-import {initDashboard} from "./dashboard.js";
+import {initDashboard, reconnectWebSocket} from "./dashboard.js";
 import {bindControlButtons} from "./control.js";
 import {initFeedingSettings} from "./feeding.js";
 import {initThresholdSettings} from "./threshold.js";
@@ -114,22 +114,25 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.aquarium-card').forEach(c => c.classList.remove('ring-2', 'ring-blue-500'));
         card.classList.add('ring-2', 'ring-blue-500');
 
+        // WebSocket 재연결
+        reconnectWebSocket();
+
         // 환경 설정 값 업데이트
         fetch(`${API_BASE}/api/aquariums/${id}/thresholds`, {
             headers: AUTH_HEADER
         })
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById('min-temp').value = data.minTemperature ?? 24.0;
-            document.getElementById('max-temp').value = data.maxTemperature ?? 27.0;
-            document.getElementById('min-ph').value = data.minPH ?? 6.5;
-            document.getElementById('max-ph').value = data.maxPH ?? 8.0;
-            document.getElementById('min-turb').value = data.minTurbidity ?? 0.0;
-            document.getElementById('max-turb').value = data.maxTurbidity ?? 11.0;
-        })
-        .catch(error => {
-            console.error('환경 설정 값 로드 중 오류 발생:', error);
-        });
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('min-temp').value = data.minTemperature ?? 24.0;
+                document.getElementById('max-temp').value = data.maxTemperature ?? 27.0;
+                document.getElementById('min-ph').value = data.minPH ?? 6.5;
+                document.getElementById('max-ph').value = data.maxPH ?? 8.0;
+                document.getElementById('min-turb').value = data.minTurbidity ?? 0.0;
+                document.getElementById('max-turb').value = data.maxTurbidity ?? 11.0;
+            })
+            .catch(error => {
+                console.error('환경 설정 값 로드 중 오류 발생:', error);
+            });
 
         // 차트 업데이트
         const activeRangeButton = document.querySelector('.multi-chart-range-btn.bg-blue-100');
@@ -224,16 +227,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         // 어항 삭제 후 차트 및 데이터 새로고침
                         const remainingCards = document.querySelectorAll('.aquarium-card');
                         if (remainingCards.length > 0) {
-                             const newId = remainingCards[0].dataset.id;
-                             localStorage.setItem('selectedAquariumId', newId);
-                             updateFishSelect();
-                             initCharts(); // 새 어항 선택 후 차트 새로고침
-                         } else {
-                             localStorage.removeItem('selectedAquariumId');
-                             console.log("🧼 모든 어항이 삭제됨");
-                             // 모든 어항 삭제 시 차트 초기화 또는 숨김 처리 필요
-                             // 현재는 페이지 새로고침으로 처리될 것으로 예상
-                         }
+                            const newId = remainingCards[0].dataset.id;
+                            localStorage.setItem('selectedAquariumId', newId);
+                            updateFishSelect();
+                            initCharts(); // 새 어항 선택 후 차트 새로고침
+                        } else {
+                            localStorage.removeItem('selectedAquariumId');
+                            console.log("🧼 모든 어항이 삭제됨");
+                            // 모든 어항 삭제 시 차트 초기화 또는 숨김 처리 필요
+                            // 현재는 페이지 새로고침으로 처리될 것으로 예상
+                        }
                     } else {
                         const msg = await res.text();
                         alert(`삭제 실패: ${msg}`);

@@ -9,28 +9,46 @@ export function initDashboard() {
     connectWebSocket();
 }
 
+export function reconnectWebSocket() {
+    if (stompClient) {
+        stompClient.disconnect();
+    }
+    connectWebSocket();
+}
+
 function connectWebSocket() {
     const socket = new SockJS(`${API_BASE}/ws`);
     stompClient = Stomp.over(socket);
-    
+
     // 디버그 모드 활성화
     stompClient.debug = function(str) {
         console.log('STOMP: ' + str);
     };
 
-    stompClient.connect({}, 
+    stompClient.connect({},
         // 성공 콜백
         () => {
             console.log('WebSocket 연결 성공');
             reconnectAttempts = 0;
-            
+
+            const selectedAquariumId = localStorage.getItem('selectedAquariumId');
+            if (!selectedAquariumId) {
+                console.warn('선택된 어항이 없습니다.');
+                return;
+            }
+
             stompClient.subscribe('/topic/sensor', (message) => {
                 try {
                     const data = JSON.parse(message.body);
-                    console.log('수신된 센서 데이터:', data);
-                    console.log('데이터 상태:', data.status);
-                    console.log('온도:', data.temperature);
-                    updateSensorCards(data);
+                    const currentAquariumId = localStorage.getItem('selectedAquariumId');
+
+                    // 현재 선택된 어항의 데이터만 처리
+                    if (data.aquariumId && data.aquariumId.toString() === currentAquariumId) {
+                        console.log('수신된 센서 데이터:', data);
+                        console.log('데이터 상태:', data.status);
+                        console.log('온도:', data.temperature);
+                        updateSensorCards(data);
+                    }
                 } catch (error) {
                     console.error('메시지 처리 중 오류:', error);
                 }
@@ -41,7 +59,7 @@ function connectWebSocket() {
             console.error('WebSocket 연결 실패:', error);
             console.error('연결 실패 상세:', error.headers);
             console.error('연결 실패 메시지:', error.body);
-            
+
             if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
                 reconnectAttempts++;
                 console.log(`재연결 시도 ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}`);

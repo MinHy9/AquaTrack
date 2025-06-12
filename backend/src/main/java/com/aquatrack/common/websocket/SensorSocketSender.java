@@ -24,9 +24,21 @@ public class SensorSocketSender {
     }
 
     // WebSocket으로 전송할 DTO 정의 (JSON으로 직렬화됨)
-    public record SensorDataDTO(float temperature, float ph, float turbidity, String status) {
+    public record SensorDataDTO(
+            Long aquariumId,
+            float temperature,
+            float ph,
+            float turbidity,
+            String status
+    ) {
         public SensorDataDTO(WaterQualityLog log) {
-            this(log.getTemperature(), log.getPH(), log.getTurbidity(), log.getStatus());
+            this(
+                    log.getAquarium().getAquariumId(),
+                    log.getTemperature(),
+                    log.getPH(),
+                    log.getTurbidity(),
+                    log.getStatus()
+            );
         }
     }
 }
