@@ -3,7 +3,6 @@
 .gitignore
 README.md
 Dockerfile
-Dockerfile-frontend
 .env
 *.log
 
