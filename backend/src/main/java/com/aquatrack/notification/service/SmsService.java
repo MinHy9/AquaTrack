@@ -29,7 +29,7 @@ public class SmsService {
     public void sendSms(String phoneNumber, String messageText) {
         try {
             Message message = new Message();
-            message.setFrom("01012345678"); // ✅ 본인 인증된 발신번호로 교체
+            message.setFrom("01094744116"); // ✅ 본인 인증된 발신번호로 교체
             message.setTo(phoneNumber);
             message.setText(messageText);
 
