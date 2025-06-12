@@ -1,6 +1,6 @@
 export const API_BASE = location.origin.includes('localhost')
     ? 'http://localhost:8080'
-    : 'http://211.188.59.134:8080';
+    : 'http://211.188.59.51:8080';
 
 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
