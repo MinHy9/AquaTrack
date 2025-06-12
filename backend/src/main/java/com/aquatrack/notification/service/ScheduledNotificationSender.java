@@ -25,7 +25,7 @@ public class ScheduledNotificationSender {
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime tenMinutesAgo = now.minusMinutes(10);
-        List<WaterQualityLog> logs = waterQualityLogRepository.findByRecordedAtAfter(tenMinutesAgo.atZone(ZoneId.systemDefault()).toInstant());
+        List<WaterQualityLog> logs = waterQualityLogRepository.findByRecordedAtAfter(tenMinutesAgo);
 
         for (WaterQualityLog log : logs) {
             if (log.getAquarium() == null || log.getAquarium().getUser() == null) continue;

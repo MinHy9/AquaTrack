@@ -65,6 +65,6 @@ public interface WaterQualityLogRepository extends JpaRepository<WaterQualityLog
     Optional<WaterQualityLog> findTopByAquarium_User_EmailOrderByRecordedAtDesc(String email);
 
     //경고 재전송에 필요한 시간값
-    List<WaterQualityLog> findByRecordedAtAfter(Instant time);
+    List<WaterQualityLog> findByRecordedAtAfter(LocalDateTime time);
 
 }
